@@ -6,7 +6,7 @@ colorscheme onedark
 highlight Normal ctermbg=NONE
 highlight nonText ctermbg=NONE
 let g:lightline = {
-    \ 'colorscheme': 'onedark',
+    \ 'colorscheme': 'dracula',
     \ }
 " View Settings
 set autoread
