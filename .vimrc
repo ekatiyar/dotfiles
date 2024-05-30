@@ -32,5 +32,5 @@ set smartindent         " even better autoindent (e.g. add indent after '{')
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 " Persistent undo
 set undofile " Maintain undo history between sessions
-set undodir=~/vim/undodir
+set undodir=~/.vim/undodir
 
