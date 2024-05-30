@@ -70,11 +70,10 @@ ZSH_THEME="random"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(zoxide fzf git you-should-use zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(zoxide fzf git zsh-you-should-use zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 source $ZSH/custom/.bash_aliases
-
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
