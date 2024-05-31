@@ -9,3 +9,7 @@ Run the following commands to set everything up:
 1. Cd to your home directory `cd ~`
 2. Use `git clone --recursive https://github.com/eashman123/dotfiles.git` in order to clone this repository, as all plugins are included as git submodules 
 3. Cd into the directory `cd dotfiles/` and run `stow .`
+
+# Also install:
+  - [Tealdeer](https://github.com/dbrgn/tealdeer)
+
