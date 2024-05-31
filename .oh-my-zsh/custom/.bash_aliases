@@ -6,3 +6,6 @@ alias gc="git commit -m"
 
 #Navigation
 alias ll="ls -lah"
+
+# Reload zsh
+alias rezsh="source ~/.zshrc"
