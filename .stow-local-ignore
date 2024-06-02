@@ -22,4 +22,4 @@ _darcs
 ^/LICENSE.*
 ^/COPYING
 
-\setup.sh # dotfile setup script
+setup.sh # dotfile setup script
