@@ -12,7 +12,11 @@ install_package() {
 
   if ! command_exists "$command_name"; then
     echo "Installing $package_name..."
-    apt install -y "$package_name"
+    if [ "$(id -u)" -eq 0 ]; then
+      apt install -y "$package_name"
+    else
+      sudo apt install -y "$package_name"
+    fi
   else
     echo "$package_name is already installed. Skipping..."
   fi
