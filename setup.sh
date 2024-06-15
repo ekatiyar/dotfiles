@@ -7,16 +7,25 @@ command_exists() {
 
 # Function to install packages if not already installed
 install_package() {
-  if ! command_exists "$1"; then
-    echo "Installing $1..."
-    apt install -y "$1"
+  local package_name=$1
+  local command_name=${2:-$1}  # Use the second argument as command name (in case of alias), default to package name
+
+  if ! command_exists "$command_name"; then
+    echo "Installing $package_name..."
+    apt install -y "$package_name"
   else
-    echo "$1 is already installed. Skipping..."
+    echo "$package_name is already installed. Skipping..."
   fi
 }
 
+# Install stow
+install_package stow
+
 # Install zsh
 install_package zsh
+
+# Install ripgrep
+install_package ripgrep rg
 
 # Install zoxide
 install_package zoxide
@@ -25,7 +34,7 @@ install_package zoxide
 install_package fzf
 
 # Install tealdeer
-install_package tealdeer
+install_package tealdeer tldr # Not currently available on all Linux Distros this way, may need to `cargo install` it
 
 # Check if Oh My Zsh is installed
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
