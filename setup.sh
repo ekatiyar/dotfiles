@@ -9,18 +9,25 @@ command_exists() {
 install_package() {
   local package_name=$1
   local command_name=${2:-$1}  # Use the second argument as command name (in case of alias), default to package name
+  local custom_install_cmd=${3:-"apt install -y $package_name"}  # Default install command can be overridden
 
   if ! command_exists "$command_name"; then
     echo "Installing $package_name..."
     if [ "$(id -u)" -eq 0 ]; then
-      apt install -y "$package_name"
+      $custom_install_cmd
     else
-      sudo apt install -y "$package_name"
+      sudo $custom_install_cmd
     fi
   else
     echo "$package_name is already installed. Skipping..."
   fi
 }
+
+# update packages
+sudo apt update
+
+# Install Rust
+install_package rustc rustc "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source $HOME/.cargo/env"
 
 # Install stow
 install_package stow
@@ -38,7 +45,7 @@ install_package zoxide
 install_package fzf
 
 # Install tealdeer
-install_package tldr
+install_package tealdeer tldr "cargo install tealdeer"
 
 # Check if Oh My Zsh is installed
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
