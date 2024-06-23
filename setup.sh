@@ -9,14 +9,19 @@ command_exists() {
 install_package() {
   local package_name=$1
   local command_name=${2:-$1}  # Use the second argument as command name (in case of alias), default to package name
-  local custom_install_cmd=${3:-"apt install -y $package_name"}  # Default install command can be overridden
+  local custom_install_cmd=$3  # Custom install command if package manager install is not applicable
 
   if ! command_exists "$command_name"; then
-    echo "Installing $package_name..."
-    if [ "$(id -u)" -eq 0 ]; then
-      $custom_install_cmd
+    if [ -z "$custom_install_cmd" ]; then
+      echo "Installing $package_name..."
+      if [ "$(id -u)" -eq 0 ]; then
+        apt install -y "$package_name"
+      else
+        sudo apt install -y "$package_name"
+      fi
     else
-      sudo $custom_install_cmd
+      echo "Installing $package_name with custom command..."
+      eval "$custom_install_cmd"
     fi
   else
     echo "$package_name is already installed. Skipping..."
@@ -27,7 +32,7 @@ install_package() {
 sudo apt update
 
 # Install Rust
-install_package rustc rustc "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && source $HOME/.cargo/env"
+install_package rustc rustc "(curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh) && source $HOME/.cargo/env"
 
 # Install stow
 install_package stow
@@ -44,7 +49,10 @@ install_package zoxide
 # Install fzf
 install_package fzf
 
+
 # Install tealdeer
+# Requires cc linker
+install_package build-essential cc
 install_package tealdeer tldr "cargo install tealdeer"
 
 # Check if Oh My Zsh is installed
