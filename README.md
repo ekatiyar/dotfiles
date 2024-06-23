@@ -7,7 +7,7 @@ My personal terminal configuration dotfiles, with easy deployment using stow. In
 ## Instructions
 Run the following commands to set everything up:
 1. Cd to your home directory `cd ~`
-2. Use `git clone --recursive https://github.com/eashman123/dotfiles.git` in order to clone this repository, as all plugins are included as git submodules 
+2. Use `git clone --recursive git@github.com:ekatiyar/dotfiles.git` in order to clone this repository, as all plugins are included as git submodules 
 3. Cd into the directory `cd dotfiles/` and run `sudo ./setup.sh`
 
 # Also installs:

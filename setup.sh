@@ -38,7 +38,7 @@ install_package zoxide
 install_package fzf
 
 # Install tealdeer
-install_package tealdeer tldr # Not currently available on all Linux Distros this way, may need to `cargo install` it
+install_package tldr
 
 # Check if Oh My Zsh is installed
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
