@@ -10,3 +10,4 @@ alias ll="ls -lah"
 
 # Reload zsh
 alias rezsh="source ~/.zshrc"
+
