@@ -1,6 +1,5 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
-export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -71,11 +70,15 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(zoxide fzf git rust ripgrep zsh-you-should-use zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(fzf git ripgrep zsh-you-should-use zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
-source $ZSH/custom/.bash_aliases
+source $HOME/.bashrc
 # User configuration
+
+if [ -z "$DISABLE_ZOXIDE" ]; then
+    eval "$(zoxide init zsh)"
+fi
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
