@@ -57,6 +57,8 @@
   "showClearContextOnPlanAccept": true,
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": false,
+  "theme": "auto",
+  "awaySummaryEnabled": false,
   "preferredNotifChannel": "terminal_bell",
   "autoCompactEnabled": false,
   "teammateMode": "auto",
