@@ -143,7 +143,8 @@ install_claude() {
 #    recreate it as a relative, stow-owned link. Nothing else is touched.
 clean_legacy_links() {
   log "Removing legacy absolute symlinks that point into the repo"
-  local entry name target link
+  local entry name target link _shopt_save
+  _shopt_save=$(shopt -p dotglob nullglob)
   shopt -s dotglob nullglob          # include dotfiles; empty globs disappear
   for entry in "$DOTFILES_DIR"/*; do
     name="${entry##*/}"
@@ -161,6 +162,7 @@ clean_legacy_links() {
       done < <(find "$target" -type l 2>/dev/null)
     fi
   done
+  eval "$_shopt_save"
 }
 
 # 7. run_stow — the single symlink pass. Stow dir = the repo, target = $HOME
@@ -198,7 +200,7 @@ merge_mcp() {
   tmpbase="${TMPDIR:-/tmp}"
   tmpfile="$(mktemp "${tmpbase%/}/dotfiles-claude.XXXXXX.json")"
   [ -f "$HOME/.claude.json" ] || printf '{}\n' > "$HOME/.claude.json"
-  jq -s '.[0].mcpServers = ((.[0].mcpServers // {}) * .[1].mcpServers) | .[0]' \
+  jq -s '.[0].mcpServers = ((.[0].mcpServers // {}) * (.[1].mcpServers // {})) | .[0]' \
      "$HOME/.claude.json" "$DOTFILES_DIR/.claude/.mcp.json" > "$tmpfile"
   jq -e . "$tmpfile" >/dev/null \
     || { rm -f "$tmpfile"; die "Merged ~/.claude.json failed jq validation; leaving original untouched"; }

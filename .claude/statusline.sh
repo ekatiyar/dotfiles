@@ -2,7 +2,7 @@
 input=$(cat)
 
 # Extract all values in a single jq call (tab-separated)
-IFS=$'\t' read -r cwd model ctx_pct total_s tok transcript_path < <(
+IFS=$'\x01' read -r cwd model effort_level ctx_pct total_s tok transcript_path rate_5h reset_5h rate_7d reset_7d < <(
   echo "$input" | jq -r '
     def fmt: if . >= 1000000 then (. / 100000 | floor) as $u
       | "\($u / 10 | floor).\($u % 10)m" else "\(. / 1000 | floor)k" end;
@@ -13,11 +13,16 @@ IFS=$'\t' read -r cwd model ctx_pct total_s tok transcript_path < <(
     [
       (.cwd // ""),
       ((.model | if type == "object" then .display_name // .id else . end) // ""),
+      (.effort.level // ""),
       ($ctx.used_percentage // 0),
       (($ctx.context_window_size // 0) | fmt),
       (if $actual > 0 then $actual | fmt else "0" end),
-      (.transcript_path // "")
-    ] | @tsv'
+      (.transcript_path // ""),
+      (if .rate_limits.five_hour.used_percentage != null then (.rate_limits.five_hour.used_percentage | floor) else "" end),
+      (.rate_limits.five_hour.resets_at // ""),
+      (if .rate_limits.seven_day.used_percentage != null then (.rate_limits.seven_day.used_percentage | floor) else "" end),
+      (.rate_limits.seven_day.resets_at // "")
+    ] | map(tostring) | join("\u0001")'
 )
 
 # Aggregate cost from the transcript and any subagent transcripts.
@@ -56,6 +61,28 @@ fi
 
 branch=$(cd "$cwd" 2>/dev/null && git -c gc.auto=0 branch --show-current 2>/dev/null || echo '')
 
+fmt_until() {
+  local secs=$(( $1 - $(date +%s) ))
+  [ "$secs" -le 0 ] && echo "now" && return
+  local h=$(( secs / 3600 ))
+  local m=$(( (secs % 3600) / 60 ))
+  if [ "$h" -ge 24 ]; then
+    local d=$(( h / 24 ))
+    printf '%dd %dh' "$d" $(( h % 24 ))
+  elif [ "$h" -ge 1 ]; then
+    printf '%dh %dm' "$h" "$m"
+  else
+    printf '%dm' "$m"
+  fi
+}
+
+pct_color() {
+  local pct=$(( $1 > 100 ? 100 : $1 ))
+  local r=$(( pct * 255 / 100 ))
+  local g=$(( (100 - pct) * 255 / 100 ))
+  printf '\033[38;2;%d;%d;0m' "$r" "$g"
+}
+
 # Colors
 R='\033[0m'
 GREEN='\033[38;2;63;185;80m'
@@ -66,13 +93,32 @@ FOLDER='\033[38;2;250;200;80m'
 folder="${cwd##*/}"
 parts="${FOLDER}${folder}${R}"
 [ -n "$branch" ] && parts="$parts | ${GREEN}${branch}${R}"
-[ -n "$model" ]  && parts="$parts | ${PEACH}${model}${R}"
+if [ -n "$model" ]; then
+  if [ -n "$effort_level" ]; then
+    parts="$parts | ${PEACH}${model} (${effort_level})${R}"
+  else
+    parts="$parts | ${PEACH}${model}${R}"
+  fi
+fi
 
 if [ "$ctx_pct" != "0" ]; then
   capped=$((ctx_pct > 50 ? 50 : ctx_pct))
   r=$((capped * 255 / 50))
   g=$(((50 - capped) * 255 / 50))
   parts="$parts | ctx: \033[38;2;${r};${g};0m${ctx_pct}%${R} (${tok}/${total_s})"
+fi
+
+if [ -n "$rate_5h" ]; then
+  C=$(pct_color "$rate_5h")
+  seg="5h: ${C}${rate_5h}%${R}"
+  [ -n "$reset_5h" ] && seg="$seg ($(fmt_until "$reset_5h"))"
+  parts="$parts | $seg"
+fi
+if [ -n "$rate_7d" ]; then
+  C=$(pct_color "$rate_7d")
+  seg="7d: ${C}${rate_7d}%${R}"
+  [ -n "$reset_7d" ] && seg="$seg ($(fmt_until "$reset_7d"))"
+  parts="$parts | $seg"
 fi
 
 if [ -n "$cost" ]; then
