@@ -54,13 +54,14 @@
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
   "autoUpdatesChannel": "latest",
   "autoMemoryEnabled": false,
   "theme": "auto",
-  "awaySummaryEnabled": false,
   "preferredNotifChannel": "terminal_bell",
   "autoCompactEnabled": false,
   "teammateMode": "auto",
-  "useAutoModeDuringPlan": false
+  "useAutoModeDuringPlan": false,
+  "workflowKeywordTriggerEnabled": false
 }

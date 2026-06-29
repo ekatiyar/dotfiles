@@ -16,7 +16,7 @@ fi
 HISTCONTROL=ignoreboth
 
 # append to the history file, don't overwrite it
-shopt -s histappend
+[ -n "$BASH" ] && shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=1000
@@ -24,7 +24,7 @@ HISTFILESIZE=2000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+[ -n "$BASH" ] && shopt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
@@ -39,6 +39,8 @@ if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
+# skip in zsh — oh-my-zsh manages PS1/PROMPT there
+if [ -n "$BASH" ]; then
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
@@ -74,6 +76,7 @@ xterm*|rxvt*)
 *)
     ;;
 esac
+fi
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -111,7 +114,7 @@ fi
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
+if [ -n "$BASH" ] && ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
   elif [ -f /etc/bash_completion ]; then
@@ -149,6 +152,11 @@ fi
 # Fzf Config (only needed in bash shell; zsh loads w/ plugin)
 if [ -n "$BASH" ] && [ -f ~/.fzf.bash ]; then
     source ~/.fzf.bash
+fi
+
+# Zoxide (z command) — zsh loads via oh-my-zsh plugin
+if [ -n "$BASH" ] && command -v zoxide &>/dev/null; then
+    eval "$(zoxide init bash)"
 fi
 # Use ripgrep instead of grep/git whilst still using default filters
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git/' --ignore-vcs"
