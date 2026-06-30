@@ -5,6 +5,9 @@
     "DISABLE_BUG_COMMAND": "1",
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_TELEMETRY": "1",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+    "_CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "_CLAUDE_CODE_ATTRIBUTION_HEADER" : "0",
     "DISABLE_ZOXIDE": "1",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
@@ -46,6 +49,7 @@
     "ask": [],
     "defaultMode": "default"
   },
+  "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline.sh"
@@ -62,6 +66,5 @@
   "preferredNotifChannel": "terminal_bell",
   "autoCompactEnabled": false,
   "teammateMode": "auto",
-  "useAutoModeDuringPlan": false,
-  "workflowKeywordTriggerEnabled": false
+  "model": "opusplan"
 }

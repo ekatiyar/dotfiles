@@ -16,7 +16,7 @@ gbv() {
     while IFS= read -r line; do
         branch_lines+=("$line")
         (( ${#line} > max_len )) && max_len=${#line}
-    done < <(git branch)
+    done < <(git branch --no-color)
 
     for line in "${branch_lines[@]}"; do
         local branch="${line:2}"

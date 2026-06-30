@@ -86,12 +86,12 @@ update_submodules() {
 }
 
 # 3. install_tools — brew install the full CLI set. tealdeer provides `tldr`;
-#    jq is needed by merge_mcp; zsh is the login shell (.tmux.conf and next_steps
+#    jq is needed by sync_mcp; zsh is the login shell (.tmux.conf and next_steps
 #    both expect it on PATH). fzf's install script generates ~/.fzf.{bash,zsh}
 #    without editing the soon-to-be-symlinked rc files.
 install_tools() {
   log "Installing CLI tools via Homebrew"
-  brew_install stow zoxide fzf ripgrep gh tealdeer jq zsh
+  brew_install stow zoxide fzf ripgrep gh tealdeer jq zsh github-mcp-server
 
   if [ ! -f "$HOME/.fzf.bash" ] || [ ! -f "$HOME/.fzf.zsh" ]; then
     log "Generating fzf key-bindings and completion (~/.fzf.{bash,zsh})"
@@ -122,8 +122,10 @@ install_omz() {
     return
   fi
   log "Installing Oh My Zsh"
-  RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  local installer
+  installer="$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
+    || die "Failed to fetch Oh My Zsh installer"
+  RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$installer"
 }
 
 # 5. install_claude — native installer drops the binary into ~/.local/bin.
@@ -144,7 +146,7 @@ install_claude() {
 clean_legacy_links() {
   log "Removing legacy absolute symlinks that point into the repo"
   local entry name target link _shopt_save
-  _shopt_save=$(shopt -p dotglob nullglob)
+  _shopt_save=$(shopt -p dotglob nullglob) || true
   shopt -s dotglob nullglob          # include dotfiles; empty globs disappear
   for entry in "$DOTFILES_DIR"/*; do
     name="${entry##*/}"
@@ -192,19 +194,175 @@ review_adopt() {
   fi
 }
 
-# 9. merge_mcp — deep-merge tracked MCP servers into ~/.claude.json
-#    (atomic + validated; .mcp.json itself is stow-ignored, never symlinked).
-merge_mcp() {
-  log "Merging MCP server definitions into ~/.claude.json"
-  local tmpbase tmpfile
-  tmpbase="${TMPDIR:-/tmp}"
-  tmpfile="$(mktemp "${tmpbase%/}/dotfiles-claude.XXXXXX.json")"
-  [ -f "$HOME/.claude.json" ] || printf '{}\n' > "$HOME/.claude.json"
-  jq -s '.[0].mcpServers = ((.[0].mcpServers // {}) * (.[1].mcpServers // {})) | .[0]' \
-     "$HOME/.claude.json" "$DOTFILES_DIR/.claude/.mcp.json" > "$tmpfile"
-  jq -e . "$tmpfile" >/dev/null \
-    || { rm -f "$tmpfile"; die "Merged ~/.claude.json failed jq validation; leaving original untouched"; }
-  mv "$tmpfile" "$HOME/.claude.json"
+# Helper for sync_mcp: assemble a git-conflict-style JSON text buffer.
+# Argument: JSON array of classified entries (output of the classification jq call).
+_sync_mcp_build_buffer() {
+  local cls="$1"
+  local total i comma key key_type val block repo_val home_val repo_body home_body entry
+
+  total="$(printf '%s\n' "$cls" | jq 'length')"
+  i=0
+
+  printf '{\n'
+  while IFS= read -r entry; do
+    i=$((i + 1))
+    comma=","
+    [ "$i" -eq "$total" ] && comma=""
+
+    key="$(printf '%s\n' "$entry" | jq -r '.key')"
+    key_type="$(printf '%s\n' "$entry" | jq -r '.type')"
+
+    if [ "$key_type" = "auto" ]; then
+      val="$(printf '%s\n' "$entry" | jq '.val')"
+      # Strip outer { } lines → "  \"key\": ..." at 2-space indent.
+      block="$(jq -n --arg k "$key" --argjson v "$val" '{($k): $v}' | sed '1d;$d')"
+      printf '%s%s\n' "$block" "$comma"
+    else
+      repo_val="$(printf '%s\n' "$entry" | jq '.repo')"
+      home_val="$(printf '%s\n' "$entry" | jq '.home')"
+      # Body = inner lines of pretty-printed object, re-indented +2 to 4-space depth.
+      repo_body="$(printf '%s\n' "$repo_val" | jq . | sed '1d;$d' | sed 's/^/  /')"
+      home_body="$(printf '%s\n' "$home_val" | jq . | sed '1d;$d' | sed 's/^/  /')"
+      printf '  "%s": {\n' "$key"
+      printf '<<<<<<< .claude/.mcp.json (repo)\n'
+      printf '%s\n' "$repo_body"
+      printf '=======\n'
+      printf '%s\n' "$home_body"
+      printf '>>>>>>> ~/.claude.json (home)\n'
+      printf '  }%s\n' "$comma"
+    fi
+  done < <(printf '%s\n' "$cls" | jq -c '.[]')
+  printf '}\n'
+}
+
+# 9. sync_mcp — interactive deep-merge of repo .mcp.json ↔ ~/.claude.json.
+#    Identical/single-source servers are auto-included; conflicting values open
+#    an editor with git-style conflict markers. Writes back to BOTH files atomically.
+#    Skips (idempotent) when the merged result already matches both sources.
+sync_mcp() {
+  log "Syncing MCP server definitions (interactive)"
+  local home_json="$HOME/.claude.json"
+  local repo_json="$DOTFILES_DIR/.claude/.mcp.json"
+  local tmpbase="${TMPDIR:-/tmp}"
+  local tmpfile editor
+
+  [ -f "$home_json" ] || printf '{}\n' > "$home_json"
+
+  local home_servers repo_servers
+  home_servers="$(jq '.mcpServers // {}' "$home_json")"
+  repo_servers="$(jq '.mcpServers // {}' "$repo_json")"
+
+  # Classify each key: auto (identical or single-source) vs conflict (differing values).
+  local classification
+  classification="$(jq -n \
+    --argjson home "$home_servers" \
+    --argjson repo "$repo_servers" '
+    (($home | keys) + ($repo | keys)) | unique | sort | map(
+      . as $k |
+      if ($home | has($k)) and ($repo | has($k)) then
+        if $home[$k] == $repo[$k] then
+          { key: $k, type: "auto", val: $home[$k] }
+        else
+          { key: $k, type: "conflict", repo: $repo[$k], home: $home[$k] }
+        end
+      elif $home | has($k) then
+        { key: $k, type: "auto", val: $home[$k] }
+      else
+        { key: $k, type: "auto", val: $repo[$k] }
+      end
+    )
+  ')"
+
+  local conflict_count
+  conflict_count="$(printf '%s\n' "$classification" | jq '[.[] | select(.type == "conflict")] | length')"
+
+  # Idempotent: skip when no conflicts and merged result already matches both files.
+  if [ "$conflict_count" -eq 0 ]; then
+    local merged
+    merged="$(printf '%s\n' "$classification" | jq 'map({key: .key, value: .val}) | from_entries')"
+    local home_ok repo_ok
+    home_ok="$(jq -n --argjson m "$merged" --argjson h "$home_servers" '$m == $h')"
+    repo_ok="$(jq -n --argjson m "$merged" --argjson r "$repo_servers" '$m == $r')"
+    if [ "$home_ok" = "true" ] && [ "$repo_ok" = "true" ]; then
+      log "MCP servers already in sync; skipping"
+      return
+    fi
+  fi
+
+  if [ "$conflict_count" -gt 0 ]; then
+    warn "$conflict_count MCP server conflict(s) require manual resolution:"
+    printf '%s\n' "$classification" | \
+      jq -r '.[] | select(.type == "conflict") | "  conflict: \(.key)"' >&2
+  fi
+
+  tmpfile="$(mktemp "${tmpbase%/}/dotfiles-mcp.XXXXXX.json")"
+  {
+    printf '// MCP merge. Resolve each <<<<<<< / ======= / >>>>>>> conflict by keeping one\n'
+    printf '// side and deleting the markers and the other side. Lines starting with // are\n'
+    printf '// ignored. Save and exit when done.\n'
+    _sync_mcp_build_buffer "$classification"
+  } > "$tmpfile"
+
+  editor="${VISUAL:-${EDITOR:-vi}}"
+  local content attempt error_banner jq_err
+  for attempt in 1 2 3 4 5; do
+    "$editor" "$tmpfile"
+
+    # Strip JSONC // comment/banner lines before validation.
+    content="$(sed '/^[[:space:]]*\/\//d' "$tmpfile")"
+    error_banner=""
+
+    if printf '%s\n' "$content" | grep -Eq '^(<<<<<<<|=======|>>>>>>>)'; then
+      error_banner='// ERROR: Unresolved conflict markers remain — keep one side and delete the
+// <<<<<<< ======= >>>>>>> lines, then save again.'
+    else
+      jq_err=""
+      if ! jq_err="$(jq -e . <<<"$content" 2>&1 >/dev/null)"; then
+        error_banner="// ERROR (invalid JSON): ${jq_err}
+// Note: line numbers are relative to the JSON below this banner."
+      fi
+    fi
+
+    if [ -n "$error_banner" ]; then
+      if [ "$attempt" -eq 5 ]; then
+        rm -f "$tmpfile"
+        die "Too many invalid saves; both files left untouched."
+      fi
+      { printf '%s\n' "$error_banner"; printf '%s\n' "$content"; } > "$tmpfile"
+      continue
+    fi
+
+    break
+  done
+
+  local resolved
+  resolved="$(jq '.' <<<"$content")"
+  rm -f "$tmpfile"
+
+  # Write to ~/.claude.json atomically, preserving all other keys.
+  local home_tmp
+  home_tmp="$(mktemp "${tmpbase%/}/dotfiles-claude.XXXXXX.json")"
+  jq --argjson s "$resolved" '.mcpServers = $s' "$home_json" > "$home_tmp" \
+    || { rm -f "$home_tmp"; die "Failed to write updated ~/.claude.json"; }
+  jq -e . "$home_tmp" >/dev/null \
+    || { rm -f "$home_tmp"; die "Updated ~/.claude.json failed validation; leaving untouched."; }
+  mv "$home_tmp" "$home_json"
+  log "Updated ~/.claude.json"
+
+  # Write to .claude/.mcp.json only if content actually changed.
+  local new_repo
+  new_repo="$(jq -n --argjson s "$resolved" '{"mcpServers": $s}')"
+  if [ "$(jq -c . "$repo_json")" != "$(printf '%s\n' "$new_repo" | jq -c .)" ]; then
+    local repo_tmp
+    repo_tmp="$(mktemp "${tmpbase%/}/dotfiles-mcp-repo.XXXXXX.json")"
+    printf '%s\n' "$new_repo" | jq . > "$repo_tmp" \
+      || { rm -f "$repo_tmp"; die "Failed to write updated .claude/.mcp.json"; }
+    mv "$repo_tmp" "$repo_json"
+    log "Updated .claude/.mcp.json"
+    warn "Review and commit the updated .claude/.mcp.json:"
+    warn "  git -C \"$DOTFILES_DIR\" diff .claude/.mcp.json"
+    warn "  git -C \"$DOTFILES_DIR\" add .claude/.mcp.json && git -C \"$DOTFILES_DIR\" commit"
+  fi
 }
 
 # 10. next_steps — manual, auth-bound follow-ups.
@@ -231,6 +389,8 @@ main() {
     -h|--help) usage ;;
   esac
 
+  [ -t 0 ] && [ -t 1 ] || die "setup.sh must be run in an interactive terminal."
+
   preflight
   update_submodules
   install_tools
@@ -239,7 +399,7 @@ main() {
   clean_legacy_links
   run_stow
   review_adopt
-  merge_mcp
+  sync_mcp
   next_steps
 }
 

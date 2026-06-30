@@ -72,8 +72,8 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(fzf git zsh-you-should-use zsh-autosuggestions zsh-syntax-highlighting)
 
-source $ZSH/oh-my-zsh.sh
 source $HOME/.bashrc
+source $ZSH/oh-my-zsh.sh
 # User configuration
 
 if [ -z "$DISABLE_ZOXIDE" ]; then
