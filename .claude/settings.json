@@ -53,7 +53,9 @@
     "type": "command",
     "command": "bash ~/.claude/statusline.sh"
   },
-  "enabledPlugins": {},
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true
+  },
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
   "promptSuggestionEnabled": false,
