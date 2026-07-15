@@ -147,6 +147,8 @@ add_to_path "/home/linuxbrew/.linuxbrew/opt/rustup/bin"
 export PATH
 
 # User specific aliases and functions
+alias lclclaude='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1" CLAUDE_CODE_ATTRIBUTION_HEADER="0" ANTHROPIC_BASE_URL="http://127.0.0.1:8080" ANTHROPIC_API_KEY="local_token" ANTHROPIC_MODEL="my-local-coder" CLAUDE_CODE_DISABLE_1M_CONTEXT="1" claude'
+
 if [ -f ~/.bash_functions ]; then
     . ~/.bash_functions
 fi
@@ -165,6 +167,9 @@ export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git/' --ignor
 
 # GitHub token for Claude Code MCP server
 export GITHUB_TOKEN="$(gh auth token)"
+
+# llama.cpp model cache
+export LLAMA_CACHE="$HOME/repo/models"
 
 # Machine-local secrets (untracked; see ~/.secrets)
 if [ -f "$HOME/.secrets" ]; then
