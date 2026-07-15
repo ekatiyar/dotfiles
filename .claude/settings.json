@@ -6,8 +6,6 @@
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_TELEMETRY": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
-    "_CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-    "_CLAUDE_CODE_ATTRIBUTION_HEADER" : "0",
     "DISABLE_ZOXIDE": "1",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
@@ -49,6 +47,7 @@
     "ask": [],
     "defaultMode": "default"
   },
+  "model": "claude-fable-5[1m]",
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
@@ -56,15 +55,16 @@
   },
   "enabledPlugins": {},
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
   "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "theme": "auto",
   "preferredNotifChannel": "terminal_bell",
   "autoCompactEnabled": false,
   "teammateMode": "auto",
-  "model": "opusplan"
+  "agentPushNotifEnabled": true
 }
