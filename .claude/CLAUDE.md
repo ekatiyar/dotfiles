@@ -1,5 +1,7 @@
 # Best Practices
+- Avoid making assumptions. If you're unsure about anything, prompt the user with any questions you may have
 - When possible, use TDD: write the tests first, validating the failure is as expected, then write the implementation/fix, then rerunning tests after.
+- Keep code comments minimal and concise. Comment only non-obvious "why", not "what"; avoid multi-line explanatory blocks.
 
 ## Git Practices
 

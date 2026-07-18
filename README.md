@@ -10,7 +10,8 @@ tracked file sits at the path it should occupy in your home directory, and
 - [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the `git` plugin plus [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
 - [Zoxide](https://github.com/ajeetdsouza/zoxide) as a replacement for `cd`, plus [fzf](https://github.com/junegunn/fzf) for fuzzy file finding
 - [ripgrep](https://github.com/BurntSushi/ripgrep), the [GitHub CLI](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configuration, including shared global instructions, an MCP definition, and custom skills
+- [tmux](https://github.com/tmux/tmux) with basic config
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configuration, including shared global instructions, MCP server, custom skills, policy hooks, and a custom statusline
 
 ## Requirements
 
@@ -44,9 +45,8 @@ into the real directories those tools create.
    create `~/.local/bin` and the runtime dir `~/.claude` so Stow descends into it
    instead of folding it whole.
 2. **Submodules** — `git submodule update --init --recursive` (vim bundles, zsh plugins).
-3. **CLI tools** — `brew install stow zoxide fzf ripgrep gh tealdeer jq zsh`, skipping
-   formulae already present. fzf's `install` then generates `~/.fzf.{bash,zsh}`
-   without editing the rc files.
+3. **CLI tools** — `brew install stow zoxide fzf ripgrep gh tealdeer jq zsh github-mcp-server
+   tmux`, skipping formulae already present.
 4. **Oh My Zsh** — official installer with `KEEP_ZSHRC=yes` (leaves rc files for Stow).
 5. **Claude Code** — native installer (`curl … claude.ai/install.sh`).
 6. **Clean legacy links** — remove stale absolute symlinks pointing into the repo.
@@ -89,8 +89,8 @@ defaults (VCS metadata, editor backups, `README`/`LICENSE`) and adds:
   the `GITHUB_TOKEN` export (from `gh auth token`, used by the GitHub MCP server),
   and sourcing of `~/.bash_aliases`, `~/.bash_functions`, and `~/.secrets`.
 - `.bash_aliases` — generic aliases (`cd`→`z`, `gc`, `ll`, …).
-- `.bash_functions` — `gbv`, a worktree-aware `git branch -v`.
+- `.bash_functions` — `gbv`, a worktree-aware `git branch -v`, and `runplan`, which
+  executes a saved Claude plan in a fresh conversation
 - `.zshrc` — Oh My Zsh, plugins, and `zoxide init` (zoxide runs as an `eval`,
   not the OMZ plugin, so set `DISABLE_ZOXIDE=1` to turn it off).
-- `.tmux.conf` — sets `default-shell` to whichever `zsh` is on `PATH` (Homebrew
-  or system), falling back to `/usr/bin/zsh`.
+- `.tmux.conf` — sets the shell to `zsh` and provides basic QOL configs and bindings
