@@ -23,6 +23,7 @@
       "Bash(zcat:*)",
       "Bash(git log:*)",
       "Bash(git diff:*)",
+      "Bash(git grep:*)",
       "Bash(git --no-pager log:*)",
       "Bash(git --no-pager diff:*)",
       "Bash(gh pr diff:*)",
@@ -48,10 +49,62 @@
     "defaultMode": "default"
   },
   "model": "claude-fable-5[1m]",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/subagent-model-policy.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/sleep-wait-policy.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/plan-adherence.sh PostToolUse"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/plan-adherence.sh SessionStart"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/fable-orchestrator.sh"
+          }
+        ]
+      }
+    ]
+  },
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline.sh"
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/subagent-statusline.sh"
   },
   "enabledPlugins": {},
   "alwaysThinkingEnabled": true,
@@ -59,12 +112,14 @@
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
+  "askUserQuestionTimeout": "never",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "autoMemoryEnabled": false,
   "theme": "auto",
   "preferredNotifChannel": "terminal_bell",
   "autoCompactEnabled": false,
+  "switchModelsOnFlag": false,
   "teammateMode": "auto",
   "agentPushNotifEnabled": true
 }

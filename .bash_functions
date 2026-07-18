@@ -27,3 +27,48 @@ gbv() {
         fi
     done
 }
+
+# Execute a saved Claude plan in a fresh conversation.
+# Usage: runplan [path-to-plan.md] [-m|--model MODEL] [-e|--effort LEVEL]
+# Defaults to the newest plan in ~/.claude/plans/ and Claude's default model/effort.
+runplan() {
+    local plan="" model="" effort=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            -m|--model)  model="$2";  shift 2 ;;
+            -e|--effort) effort="$2"; shift 2 ;;
+            -h|--help)   echo "Usage: runplan [path-to-plan.md] [-m MODEL] [-e EFFORT]"; return 0 ;;
+            *)           plan="$1";   shift ;;
+        esac
+    done
+
+    plan="${plan:-$(ls -t "$HOME/.claude/plans/"*.md 2>/dev/null | head -n1)}"
+    if [ -z "$plan" ] || [ ! -f "$plan" ]; then
+        echo "Usage: runplan [path-to-plan.md] [-m MODEL] [-e EFFORT]  (no plan found)" >&2
+        return 1
+    fi
+
+    # Title = first line, stripped of its leading markdown '#' markers.
+    local title
+    title=$(sed -n '1s/^#\+[[:space:]]*//p' "$plan")
+
+    # Only pass --model/--effort when overridden; otherwise Claude uses its defaults.
+    local -a args=()
+    [ -n "$model" ]  && args+=(--model "$model")
+    [ -n "$effort" ] && args+=(--effort "$effort")
+
+    printf 'Plan:   %s\n' "${title:-(untitled)}"
+    printf 'File:   %s\n' "$plan"
+    printf 'Model:  %s\n' "${model:-(default)}"
+    printf 'Effort: %s\n' "${effort:-(default)}"
+
+    local confirm
+    printf 'Execute this plan? (y/n): '
+    read -r confirm </dev/tty
+    case "$confirm" in
+        [Yy]*) ;;
+        *) echo "Cancelled."; return 0 ;;
+    esac
+
+    claude "${args[@]}" "Read the plan titled \"$title\" at $plan and implement it step by step, treating it as the source of truth. Verify changes as you go, and check with me before anything destructive or ambiguous."
+}
