@@ -145,7 +145,7 @@ add_to_path "$HOME/bin"
 export PATH
 
 # User specific aliases and functions
-alias lclclaude='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1" CLAUDE_CODE_ATTRIBUTION_HEADER="0" ANTHROPIC_BASE_URL="http://127.0.0.1:8080" ANTHROPIC_API_KEY="local_token" ANTHROPIC_MODEL="my-local-coder" CLAUDE_CODE_DISABLE_1M_CONTEXT="1" claude'
+alias lclclaude='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1" CLAUDE_CODE_ATTRIBUTION_HEADER="0" ANTHROPIC_BASE_URL="http://127.0.0.1:8080" ANTHROPIC_API_KEY="local_token" ANTHROPIC_MODEL="my-local-coder" CLAUDE_CODE_DISABLE_1M_CONTEXT="1" claude --effort high'
 
 if [ -f ~/.bash_functions ]; then
     . ~/.bash_functions
