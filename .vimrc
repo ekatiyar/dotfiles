@@ -29,6 +29,7 @@ set shiftwidth=4        " number of spaces to use for each step of (auto)indent
 set softtabstop=4       " backspace after pressing <TAB> will remove up to this many spaces
 set autoindent          " copy indent from current line when starting a new line
 set smartindent         " even better autoindent (e.g. add indent after '{')
+set backspace=indent,eol,start " enable using backspace while in Insert Mode
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 " Persistent undo
 set undofile " Maintain undo history between sessions

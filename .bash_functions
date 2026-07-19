@@ -1,3 +1,19 @@
+# watch + bell on output change (without exiting)
+ping_diff() {
+    while iwatch -g "$@"; do
+        printf '\a'
+    done
+}
+
+iwatch() {
+    local cmd="${@: -1}"
+    if [ -n "$ZSH_VERSION" ]; then
+        watch --color "${@[1,-2]}" "bash -ic \"$cmd\""
+    else
+        watch --color "${@:1:$#-1}" "bash -ic \"$cmd\""
+    fi
+}
+
 # git branch -v with worktree paths
 gbv() {
     local -A worktree_map
