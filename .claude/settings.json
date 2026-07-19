@@ -48,7 +48,7 @@
     "ask": [],
     "defaultMode": "default"
   },
-  "model": "claude-fable-5[1m]",
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -100,7 +100,8 @@
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/statusline.sh"
+    "command": "bash ~/.claude/statusline.sh",
+    "refreshInterval": 5
   },
   "subagentStatusLine": {
     "type": "command",
@@ -110,7 +111,7 @@
     "rust-analyzer-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "medium",
+  "effortLevel": "high",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
