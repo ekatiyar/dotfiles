@@ -88,3 +88,24 @@ runplan() {
 
     claude "${args[@]}" "Read the plan titled \"$title\" at $plan and implement it step by step, treating it as the source of truth. Verify changes as you go, and check with me before anything destructive or ambiguous."
 }
+
+# Llama.cpp Build Pipeline
+llmb() {
+    cd ~/repo/llama.cpp || return
+    echo "🔄 Pulling latest changes..."
+    git pull
+
+    echo "⚙️ Configuring Llama.cpp..."
+    cmake -B build -S . -DGGML_CUDA=ON -DBUILD_SHARED_LIBS=OFF -DGGML_CUDA_ALLREDUCE=ON -DGGML_CUDA_NCCL=OFF
+
+    echo "🔨 Building binaries..."
+    cmake --build build --config Release -j $(nproc) --clean-first --target llama-cli llama-server
+
+    echo "✅ Build complete."
+}
+
+# Serve local coding models via llama-server router mode (see ~/.config/llama.cpp/preset.ini)
+llama-router() {
+    cd ~/repo/llama.cpp/build/bin || return
+    ./llama-server --models-preset ~/.config/llama.cpp/preset.ini "$@"
+}
