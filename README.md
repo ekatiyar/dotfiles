@@ -10,7 +10,7 @@ tracked file sits at the path it should occupy in your home directory, and
 - [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the `git` plugin plus [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
 - [Zoxide](https://github.com/ajeetdsouza/zoxide) as a replacement for `cd`, plus [fzf](https://github.com/junegunn/fzf) for fuzzy file finding
 - [ripgrep](https://github.com/BurntSushi/ripgrep), the [GitHub CLI](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
-- [tmux](https://github.com/tmux/tmux) with basic config
+- [tmux](https://github.com/tmux/tmux) with [TPM](https://github.com/tmux-plugins/tpm) using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) + [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configuration, including shared global instructions, MCP server, custom skills, policy hooks, and a custom statusline
 
 ## Requirements
@@ -33,6 +33,9 @@ gh auth login
 exec zsh
 ```
 
+Then, inside tmux, press `prefix+I` once to have TPM install tmux-resurrect
+and tmux-continuum.
+
 `setup.sh` is idempotent — re-run it any time to pick up new tools or re-link
 config; already-installed steps report skips/no-ops.
 
@@ -44,7 +47,7 @@ into the real directories those tools create.
 1. **Preflight** — require `brew` and `git` on `PATH` (it never installs either);
    create `~/.local/bin` and the runtime dir `~/.claude` so Stow descends into it
    instead of folding it whole.
-2. **Submodules** — `git submodule update --init --recursive` (vim bundles, zsh plugins).
+2. **Submodules** — `git submodule update --init --recursive` (vim bundles, zsh plugins, tpm).
 3. **CLI tools** — `brew install stow zoxide fzf ripgrep gh tealdeer jq zsh github-mcp-server
    tmux`, skipping formulae already present.
 4. **Oh My Zsh** — official installer with `KEEP_ZSHRC=yes` (leaves rc files for Stow).
@@ -53,7 +56,7 @@ into the real directories those tools create.
 7. **Stow** — single `stow --adopt --restow` pass links everything.
 8. **Review** — print any files `--adopt` imported, for git review.
 9. **MCP merge** — deep-merge `.claude/.mcp.json` into `~/.claude.json` (atomic, validated).
-10. **Next steps** — `gh auth login`, `exec zsh`.
+10. **Next steps** — `gh auth login`, `exec zsh`, tmux `prefix+I`
 
 ## How it's managed (GNU Stow)
 
@@ -66,9 +69,7 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 - `--restow` re-links cleanly on every run (idempotent).
 - `--adopt` imports any pre-existing **real** file in `$HOME` into the repo
   rather than failing or deleting it. Adopted files surface as uncommitted
-  changes — review with `git -C ~/dotfiles status` / `diff`, and
-  `git checkout -- <path>` to restore the tracked version of anything you didn't
-  mean to keep.
+  changes.
 
 ### What `.stow-local-ignore` excludes
 
@@ -93,4 +94,5 @@ defaults (VCS metadata, editor backups, `README`/`LICENSE`) and adds:
   executes a saved Claude plan in a fresh conversation
 - `.zshrc` — Oh My Zsh, plugins, and `zoxide init` (zoxide runs as an `eval`,
   not the OMZ plugin, so set `DISABLE_ZOXIDE=1` to turn it off).
-- `.tmux.conf` — sets the shell to `zsh` and provides basic QOL configs and bindings
+- `.tmux.conf` — sets the shell to `zsh`, provides basic QOL configs and bindings, and
+  loads TPM plugins

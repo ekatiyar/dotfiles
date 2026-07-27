@@ -77,11 +77,16 @@ preflight() {
   # Pre-create the runtime dir as a REAL dir so the single stow pass descends
   # into it and links the leaf files, instead of folding the whole dir.
   mkdir -p "$HOME/.claude"
+
+  # Same reasoning: keep ~/.tmux/plugins real so stow only links the tpm
+  # leaf, leaving room for TPM to clone tmux-resurrect/continuum alongside it.
+  mkdir -p "$HOME/.tmux/plugins"
 }
 
-# 2. submodules — vim bundles + zsh plugins must exist before stow links them.
+# 2. submodules — vim bundles, zsh plugins, and tpm must exist before stow
+#    links them.
 update_submodules() {
-  log "Updating git submodules (vim bundles, zsh plugins)"
+  log "Updating git submodules (vim bundles, zsh plugins, tpm)"
   git -C "$DOTFILES_DIR" submodule update --init --recursive
 }
 
@@ -376,6 +381,9 @@ next_steps() {
 
   2. Start a fresh shell to load Oh My Zsh, plugins, and aliases:
        exec zsh
+
+  3. Install tmux plugins (tmux-resurrect, tmux-continuum):
+       open tmux, then press <prefix> + I
 
 EOF
 }
