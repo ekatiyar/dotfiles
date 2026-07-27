@@ -106,6 +106,27 @@ llmb() {
 
 # Serve local coding models via llama-server router mode (see ~/.config/llama.cpp/preset.ini)
 llama-router() {
+    local LOGFILE="$HOME/llama-router.log"
     cd ~/repo/llama.cpp/build/bin || return
-    ./llama-server --models-preset ~/.config/llama.cpp/preset.ini "$@"
+
+    local gpu_pid=""
+    if command -v nvidia-smi >/dev/null 2>&1; then
+        (
+            while true; do
+                nvidia-smi --query-gpu=timestamp,name,utilization.gpu,utilization.memory,memory.used,memory.total,temperature.gpu,power.draw \
+                    --format=csv,noheader >> "$LOGFILE"
+                sleep 60
+            done
+        ) &
+        gpu_pid=$!
+    fi
+
+    # Safety net: if repeated Ctrl+C aborts this function early, still clean up the GPU loop.
+    trap '[ -n "$gpu_pid" ] && kill "$gpu_pid" 2>/dev/null' INT TERM
+
+    # Foreground pipeline: llama-server receives Ctrl+C/etc. directly, same as running it unwrapped.
+    ./llama-server --models-preset ~/.config/llama.cpp/preset.ini "$@" 2>&1 | tee -a "$LOGFILE"
+
+    [ -n "$gpu_pid" ] && kill "$gpu_pid" 2>/dev/null
+    trap - INT TERM
 }
