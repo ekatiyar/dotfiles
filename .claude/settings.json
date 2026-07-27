@@ -110,7 +110,7 @@
   },
   "enabledPlugins": {},
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
