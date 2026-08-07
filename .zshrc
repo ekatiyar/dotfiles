@@ -76,9 +76,7 @@ source $HOME/.bashrc
 source $ZSH/oh-my-zsh.sh
 # User configuration
 
-if [ -z "$DISABLE_ZOXIDE" ]; then
-    eval "$(zoxide init zsh)"
-fi
+eval "$(zoxide init zsh)"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
