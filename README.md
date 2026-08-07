@@ -12,6 +12,7 @@ tracked file sits at the path it should occupy in your home directory, and
 - [ripgrep](https://github.com/BurntSushi/ripgrep), the [GitHub CLI](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
 - [tmux](https://github.com/tmux/tmux) with [TPM](https://github.com/tmux-plugins/tpm) using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) + [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configuration: shared global instructions, MCP servers, custom skills, policy hooks, and a custom statusline
+- [llama.cpp](https://github.com/ggml-org/llama.cpp) build pipeline and serving utilities
 - Rust toolchain (`rustup`/`cargo`) on `PATH`, plus the `rust-analyzer-lsp` Claude Code plugin for language support
 
 ## Requirements
@@ -81,9 +82,47 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 `.zshrc` sources `~/.bashrc`, so the shared shell setup lives in one place:
 
 - `.bashrc` — PATH , setting environment variables, and sourcing of `~/.bash_aliases`,
-  `~/.bash_functions`, and `~/.secrets`.
+  `~/.bash_functions`, `~/.llama_functions`, and `~/.secrets`.
 - `.bash_aliases` — generic aliases
 - `.bash_functions` — multi-line bash operations, like a worktree-aware
   `git branch -v`, alias-aware `watch`, and a helper to execute saved Claude Code plans
+- `.llama_functions` — `llmb` and `llama-router` bash functions
 - `.zshrc` — Oh My Zsh, plugins
 - `.tmux.conf` — configures shell as `zsh`, provides basic QOL configs, and loads TPM plugins
+
+## Local LLM & Claude Integration
+
+- `llmb` — pulls latest and builds `llama-cli`/`llama-server`
+- `llama-router` — serves model presets from `.config/llama.cpp/preset.ini`
+- `lclclaude` alias — routes all Claude Code model tiers to local llama.cpp presets
+
+### WSL tuning (one-time manual step, requires root) - NOT part of `setup.sh`
+
+- Keep idle CPU-resident weights from being paged out
+
+  ```bash
+  echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-llama.conf
+  sudo sysctl --system
+  ```
+
+- Reduces TLB pressure for `load-mode = none` MOE models running on CPU
+
+  ```bash
+  printf 'w /sys/kernel/mm/transparent_hugepage/enabled - - - - always\n' \
+    | sudo tee /etc/tmpfiles.d/99-llama-thp.conf
+  sudo systemd-tmpfiles --create /etc/tmpfiles.d/99-llama-thp.conf
+  ```
+
+  Verify while a model is loaded: `grep AnonHugePages /proc/$(pgrep -x llama-server)/smaps_rollup`
+
+- `.wslconfig` (Windows-side)
+
+  ```ini
+  [wsl2]
+  memory=113GB
+  swap=8GB
+  guiApplications=false
+
+  [experimental]
+  autoMemoryReclaim=gradual
+  ```
