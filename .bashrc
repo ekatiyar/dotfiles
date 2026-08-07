@@ -151,6 +151,10 @@ if [ -f ~/.bash_functions ]; then
     . ~/.bash_functions
 fi
 
+if [ -f ~/.llama_functions ]; then
+    . ~/.llama_functions
+fi
+
 # Fzf Config (only needed in bash shell; zsh loads w/ plugin)
 if [ -n "$BASH" ] && [ -f ~/.fzf.bash ]; then
     source ~/.fzf.bash
