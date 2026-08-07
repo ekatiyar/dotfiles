@@ -6,7 +6,6 @@
     "DISABLE_ERROR_REPORTING": "1",
     "DISABLE_TELEMETRY": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
-    "DISABLE_ZOXIDE": "1",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
@@ -42,7 +41,9 @@
       "mcp__github__search_issues",
       "mcp__github__search_repositories",
       "mcp__github__search_users",
-      "WebSearch"
+      "WebSearch",
+      "mcp__duckduckgo-search__search",
+      "mcp__duckduckgo-search__fetch_content"
     ],
     "deny": [],
     "ask": [],
