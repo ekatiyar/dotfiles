@@ -12,6 +12,7 @@ tracked file sits at the path it should occupy in your home directory, and
 - [ripgrep](https://github.com/BurntSushi/ripgrep), the [GitHub CLI](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
 - [tmux](https://github.com/tmux/tmux) with [TPM](https://github.com/tmux-plugins/tpm) using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) + [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configuration: shared global instructions, MCP servers, custom skills, policy hooks, and a custom statusline
+- Rust toolchain (`rustup`/`cargo`) on `PATH`, plus the `rust-analyzer-lsp` Claude Code plugin for language support
 
 ## Requirements
 
