@@ -1,8 +1,28 @@
+# Fixed Qwen 3.5/3.6 chat template (froggeric v21+)
+_llama_sync_qwen_template() {
+    local url="https://huggingface.co/froggeric/Qwen-Fixed-Chat-Templates/resolve/main/chat_template.jinja"
+    local dest="${LLAMA_CACHE:-$HOME/repo/models}/templates/qwen-fixed-chat-template.jinja"
+
+    mkdir -p "$(dirname "$dest")" || return 1
+    # Stage in a temp file so a failed fetch can't truncate a working template.
+    if curl -fsSL "$url" -o "$dest.tmp"; then
+        mv "$dest.tmp" "$dest"
+        echo "✅ Qwen chat template synced: $dest"
+    else
+        rm -f "$dest.tmp"
+        echo "⚠️  Failed to fetch Qwen chat template; Qwen presets need $dest" >&2
+        return 1
+    fi
+}
+
 # Llama.cpp Build Pipeline
 llmb() {
     cd ~/repo/llama.cpp || return
     echo "🔄 Pulling latest changes..."
     git pull
+
+    echo "📄 Syncing Qwen chat template..."
+    _llama_sync_qwen_template
 
     echo "⚙️ Configuring Llama.cpp..."
     cmake -B build -S . -DGGML_CUDA=ON -DBUILD_SHARED_LIBS=OFF -DGGML_CUDA_ALLREDUCE=ON -DGGML_CUDA_NCCL=OFF
