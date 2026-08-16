@@ -1,61 +1,38 @@
 ---
 name: triage-branch-changes
-description: Classify uncommitted dotfile changes as master (shared) or branch-specific, then commit each set to the right branch
+description: Classify uncommitted dotfile changes across all local branches, then commit each set to the branch that owns it
 disable-model-invocation: true
 ---
 
 # Triage Branch Changes
 
-Sort uncommitted changes between `master` (shared configs) and the current feature branch, then commit each set to the correct branch.
-
-## Prerequisites
-
-- Current branch must NOT be `master` (there's nothing to triage on master itself)
-- Working tree must have uncommitted changes (staged, unstaged, or untracked)
-
 ## Steps
 
-1. **Identify branches**: run `git branch --show-current` to get the current branch. The base branch is `master`. If already on master, stop and tell the user this skill only works from a feature branch.
+1. Stop if the tree is clean. Otherwise fetch, and fast-forward every local branch that tracks a remote. Report any branch that won't fast-forward and stop.
 
-2. **Collect all uncommitted changes**:
-   ```bash
-   git status --short
-   ```
-   List every changed file (staged, unstaged, untracked). If there are no changes, stop and tell the user.
+2. Work out what each local branch is for, from its name and its recent commits. Every one is a candidate target, not just the default branch and the one you are on.
 
-3. **Classify each file** into one of three categories:
-   - **master** — shared configs that benefit all branches (e.g. `.bash_aliases`, `.bash_functions`, `.claude/` skills/settings, `.gitconfig`, `.tmux.conf`, shared shell configs)
-   - **branch** — files specific to the current branch (e.g. machine- or toolchain-specific configs, or changes that only make sense in the context of this branch)
-   - **skip** — transient working-state files that should stay uncommitted (e.g. scratch files, temporary logs, editor swap files)
+3. Classify every uncommitted change (staged, unstaged, untracked) onto one branch, or **skip**:
+   - Config that every branch benefits from → the shared default branch.
+   - Anything belonging to a branch's concern → that branch, even when it lives in shared-looking config.
+   - Scratch files, logs, editor swap files → **skip**; they stay uncommitted.
+   - `.gitmodules` and submodule pointer bumps → always flag; `git stash` does not recurse into submodules, so a bump rides along on every branch switch.
+   - When uncertain, prefer the narrower branch over the shared one.
 
-   Use these heuristics:
-   - Files under `.claude/skills/` and `.claude/commands/` → **master** (workflow tools are shared)
-   - `.claude/settings.json`, `.claude/settings.local.json` → **master**
-   - Shell config files (`.bash_aliases`, `.bash_functions`, `.bashrc`, `.zshrc`, `.gitconfig`, `.tmux.conf`) → **master** unless the change is clearly branch-specific
-   - Files with branch-name-related content or machine/toolchain-specific tooling → **branch**
-   - When uncertain, default to **branch** (safer; can always cherry-pick to master later)
+4. Present one approval gate and wait for it (via ExitPlanMode when in plan mode):
 
-4. **Present the classification** to the user as a table:
-   | File | Category | Reason |
-   Show the proposed commit messages for each group. **Ask for approval** before proceeding. Let the user re-classify any files.
+   | File | Branch | Reason |
 
-5. **Execute the commit workflow** (only after user approval):
-   a. Stash ALL changes (including untracked): `git stash push --include-untracked -m "triage-branch-changes: temp stash"`
-   b. Checkout master: `git checkout master`
-   c. Apply ONLY the master-category files from stash:
-      - For tracked files (shown as `M`/`A`/`D` in `git status`), run `git checkout stash@{0} -- <file>`
-      - For untracked files (shown as `??`), run `git checkout stash@{0}^3 -- <file>` instead. `--include-untracked` stores untracked files in the stash's third parent (`^3`), so `stash@{0} -- <file>` will fail with `did not match any file(s) known to git`.
-   d. Stage and commit the master changes: `git add <master-files> && git commit -m "<master commit message>"`
-   e. Checkout the feature branch: `git checkout <branch>`
-   f. Merge master into the feature branch: `git merge master`
-   g. Reconcile the stash: try `git stash pop stash@{0}`. If all changes were master-category, step f already merged them in, so the pop exits non-zero and keeps the stash (`already exists, no checkout`) — this is expected, not a step-6 failure. Verify the content is already present (`git diff stash@{0} HEAD -- <file>` for tracked, `git show stash@{0}^3:<path> | diff - <path>` for untracked), then `git stash drop stash@{0}`. If a stashed change is NOT present (e.g. branch-category files), let the pop apply it before dropping.
-   h. Stage and commit the branch-category files: `git add <branch-files> && git commit -m "<branch commit message>"`. Skip this when there are no branch-category files.
-   i. Run `git status --short`, `git diff --stat`, and `git diff --cached --stat`. Confirm there are no remaining diffs except files explicitly classified as skip.
-   j. Skipped files remain uncommitted in the working tree.
+   Group the table by branch, shared first and **skip** last, and flag anything you were unsure about. Follow it with every commit you intend to make, in order, grouped under the branch each one lands on, with its full message, including any merge between branches. Let the user re-classify anything before you proceed.
 
-6. **Handle errors**: if any step fails (merge conflict, stash pop conflict, etc.):
-   - Stop immediately and report the exact error
-   - Do NOT attempt automatic resolution
-   - Suggest manual recovery steps (e.g. `git stash list`, `git merge --abort`)
+5. Commit. When everything lands on the branch you are already on, just commit it and skip the rest of this step.
+   a. Stash everything, including untracked files.
+   b. For each target branch, shared first: check it out, restore that branch's files from the stash, then commit. Tracked files come back with `git checkout stash@{0} -- <file>`; untracked ones live in the stash's third parent, so those need `stash@{0}^3 -- <file>`. Deletions do not come back from the stash at all — replay them with `git rm`, and treat a rename as its delete and add halves.
+   c. Return to the branch you started on, and merge in any branch whose changes it should carry.
+   d. `git stash pop` to bring the **skip** files back. A pop that fails with `already exists, no checkout` means a merge already carried the committed content in — confirm the skip files are in the working tree and the committed content is present, then `git stash drop`.
 
-7. **Report results**: show the final `git log --oneline -5` for both master and the feature branch so the user can verify.
+   **DO NOT** push, resolve a conflict on your own, or commit anything classified **skip**.
+
+6. On any failure, stop and report the exact error with recovery hints (`git stash list`, `git merge --abort`). Do not attempt to fix it.
+
+7. Report `git log --oneline -5` for every branch you touched, and confirm `git status` shows only the **skip** files and `git stash list` is empty.
