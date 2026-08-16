@@ -18,8 +18,6 @@
     "reddit": {
       "command": "uvx",
       "args": [
-        "--from",
-        "${HOME}/repo/simple-reddit-mcp",
         "simple-reddit-mcp"
       ]
     }

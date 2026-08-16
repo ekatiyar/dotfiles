@@ -7,8 +7,6 @@ disable-model-invocation: true
 
 # Audit Claude Code Configuration
 
-Scan all `.claude` directories, report everything configured (permissions, MCP servers, skills, commands), then propose a consolidation plan.
-
 ## Steps
 
 1. **Discover all `.claude` directories** under `$HOME`:
