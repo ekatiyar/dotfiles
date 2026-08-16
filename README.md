@@ -48,7 +48,7 @@ into the real directories those tools create.
 
 1. **Preflight** — checks for `brew` and `git` on `PATH`; pre-create certain folders
    to prevent Stow from symlinking at too high a directory level
-2. **Submodules** — `git submodule update --init --recursive` (vim bundles, zsh plugins, tpm).
+2. **Submodules** — `git submodule update --init --remote` (vim bundles, zsh plugins, tpm).
 3. **CLI tools** — `brew install`
 4. **Oh My Zsh** — official installer with `KEEP_ZSHRC=yes` (leaves rc files for Stow).
 5. **Claude Code** — native installer (`curl … claude.ai/install.sh`).
