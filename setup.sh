@@ -87,7 +87,17 @@ preflight() {
 #    links them.
 update_submodules() {
   log "Updating git submodules (vim bundles, zsh plugins, tpm)"
-  git -C "$DOTFILES_DIR" submodule update --init --recursive
+  git -C "$DOTFILES_DIR" submodule update --init --remote
+
+  local bumped
+  bumped="$(git -C "$DOTFILES_DIR" submodule status | grep '^+' || true)"
+  if [ -n "$bumped" ]; then
+    warn "Submodule pointers moved; review and commit:"
+    warn "  git -C \"$DOTFILES_DIR\" diff --submodule=log"
+    printf '%s\n' "$bumped" >&2
+  else
+    log "All submodules already current; no pointer changes"
+  fi
 }
 
 # 3. install_tools — brew install the full CLI set. tealdeer provides `tldr`;
@@ -186,7 +196,7 @@ run_stow() {
 # 8. review_adopt — surface anything --adopt pulled into the repo.
 review_adopt() {
   local changes
-  changes="$(git -C "$DOTFILES_DIR" status --short)"
+  changes="$(git -C "$DOTFILES_DIR" status --short --ignore-submodules=all)"
   if [ -n "$changes" ]; then
     warn "stow --adopt imported pre-existing home files into the repo."
     warn "Review and restore intended versions:"

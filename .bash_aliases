@@ -14,4 +14,7 @@ alias rezsh="source ~/.zshrc"
 alias fable='CLAUDE_CODE_EFFORT_LEVEL=medium claude --model fable'
 
 # Claude Code: Sonnet.
-alias sonnet='claude --model sonnet --settings '"'"'{"useAutoModeDuringPlan": false}'"'"''
+alias sonnet='claude --model sonnet'
+
+# Claude Code: enable remote control
+alias rclaude='claude --settings '"'"'{"env": {"DISABLE_TELEMETRY": ""}}'"'"''
