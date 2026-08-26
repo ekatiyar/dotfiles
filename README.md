@@ -7,7 +7,7 @@ tracked file sits at the path it should occupy in your home directory, and
 ## What's Included
 
 - [Vim](https://github.com/vim/vim) configuration with [pathogen](https://github.com/tpope/vim-pathogen), [onedark](https://github.com/joshdick/onedark.vim), and [lightline](https://github.com/itchyny/lightline.vim)
-- [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the `git` plugin plus [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
+- [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the following plugins: `git`, `fzf`, `zoxide`, [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
 - [Zoxide](https://github.com/ajeetdsouza/zoxide) as a replacement for `cd`, plus [fzf](https://github.com/junegunn/fzf) for fuzzy file finding
 - [ripgrep](https://github.com/BurntSushi/ripgrep), the [GitHub CLI](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
 - [tmux](https://github.com/tmux/tmux) with [TPM](https://github.com/tmux-plugins/tpm) using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) + [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)

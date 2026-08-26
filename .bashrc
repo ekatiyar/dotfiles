@@ -161,7 +161,7 @@ fi
 # Use ripgrep instead of grep/git whilst still using default filters
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git/' --ignore-vcs"
 
-# GitHub token for Claude Code MCP server
+# GitHub token for MCP server
 export GITHUB_TOKEN="$(gh auth token)"
 
 # Machine-local secrets (untracked; see ~/.secrets)
