@@ -10,29 +10,22 @@ disable-model-invocation: true
 
 1. Stop if the tree is clean. Otherwise fetch, and fast-forward every local branch that tracks a remote. Report any branch that won't fast-forward and stop.
 
-2. Work out what each local branch is for, from its name and its recent commits. Every one is a candidate target, not just the default branch and the one you are on.
+2. Work out what each local branch is for, from its name and its recent commits. Every one is a candidate target, not just the default/master branch and the one you are on.
 
-3. Classify every uncommitted change (staged, unstaged, untracked) onto one branch, or **skip**:
-   - Config that every branch benefits from → the shared default branch.
-   - Anything belonging to a branch's concern → that branch, even when it lives in shared-looking config.
-   - Scratch files, logs, editor swap files → **skip**; they stay uncommitted.
-   - `.gitmodules` and submodule pointer bumps → always flag; `git stash` does not recurse into submodules, so a bump rides along on every branch switch.
-   - When uncertain, prefer the narrower branch over the shared one.
+3. **Classify each changed file** as **master** (shared: `.claude/` skills/settings, shell configs, `.gitconfig`, etc.), **branch** (specific to a given branch's function), or **skip** (transient scratch/state files). When uncertain, default to branch — it can always be cherry-picked to master later.
 
-4. Present one approval gate and wait for it (via ExitPlanMode when in plan mode):
+4. **Present the classification** as a table with proposed commit messages, and **ask for approval**.
 
    | File | Branch | Reason |
 
    Group the table by branch, shared first and **skip** last, and flag anything you were unsure about. Follow it with every commit you intend to make, in order, grouped under the branch each one lands on, with its full message, including any merge between branches. Let the user re-classify anything before you proceed.
 
-5. Commit. When everything lands on the branch you are already on, just commit it and skip the rest of this step.
-   a. Stash everything, including untracked files.
-   b. For each target branch, shared first: check it out, restore that branch's files from the stash, then commit. Tracked files come back with `git checkout stash@{0} -- <file>`; untracked ones live in the stash's third parent, so those need `stash@{0}^3 -- <file>`. Deletions do not come back from the stash at all — replay them with `git rm`, and treat a rename as its delete and add halves.
-   c. Return to the branch you started on, and merge in any branch whose changes it should carry.
-   d. `git stash pop` to bring the **skip** files back. A pop that fails with `already exists, no checkout` means a merge already carried the committed content in — confirm the skip files are in the working tree and the committed content is present, then `git stash drop`.
+5. **Execute**: stash everything (`--include-untracked`), commit the master set on master, merge master back into the feature branch, then restore and commit the branch set. Skipped files stay uncommitted. Verify with `git status` that nothing unexpected remains.
+
+   Gotchas: untracked files live in the stash's **third parent** — restore with `git checkout stash@{0}^3 -- <file>`, not `stash@{0}`. If all changes were master-category, `git stash pop` fails with "already exists, no checkout" because the merge already brought them in — this is expected; verify the content is present and `git stash drop`.
 
    **DO NOT** push, resolve a conflict on your own, or commit anything classified **skip**.
 
-6. On any failure, stop and report the exact error with recovery hints (`git stash list`, `git merge --abort`). Do not attempt to fix it.
+6. **On any failure** (merge/pop conflict): stop, report the exact error, and suggest manual recovery steps — do NOT attempt automatic resolution.
 
-7. Report `git log --oneline -5` for every branch you touched, and confirm `git status` shows only the **skip** files and `git stash list` is empty.
+7. **Report** the final `git log --oneline -5` for every branch you touched, and confirm `git status` shows only the **skip** files and `git stash list` is empty.
