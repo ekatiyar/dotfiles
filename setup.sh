@@ -48,7 +48,7 @@ EOF
 # Steps
 # ----------------------------------------------------------------------------
 
-# 1. preflight — require brew + git on PATH (never install, never sudo) and
+# 1. preflight — require brew, curl, and git on PATH (never install, never sudo) and
 #    pre-create the dirs that let stow descend (unfold) rather than fold whole
 #    directories.
 preflight() {
@@ -68,6 +68,8 @@ preflight() {
 
   command -v brew >/dev/null 2>&1 \
     || die "Homebrew is required but not found on PATH. Install it first: https://brew.sh"
+  command -v curl >/dev/null 2>&1 \
+    || die "curl is required but not found on PATH."
   command -v git >/dev/null 2>&1 \
     || die "git is required but not found on PATH."
 
@@ -81,12 +83,13 @@ preflight() {
   # Same reasoning: keep ~/.tmux/plugins real so stow only links the tpm
   # leaf, leaving room for TPM to clone tmux-resurrect/continuum alongside it.
   mkdir -p "$HOME/.tmux/plugins"
+
+  mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/vim/undo"
 }
 
-# 2. submodules — vim bundles, zsh plugins, and tpm must exist before stow
-#    links them.
+# 2. submodules — external dependencies must exist before stow links them.
 update_submodules() {
-  log "Updating git submodules (vim bundles, zsh plugins, tpm)"
+  log "Updating git submodules"
   git -C "$DOTFILES_DIR" submodule update --init --remote
 
   local bumped
