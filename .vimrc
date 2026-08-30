@@ -33,5 +33,10 @@ set backspace=indent,eol,start " enable using backspace while in Insert Mode
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 " Persistent undo
 set undofile " Maintain undo history between sessions
-set undodir=~/.vim/undodir
 
+if exists('$XDG_STATE_HOME') && !empty($XDG_STATE_HOME)
+    let s:state_home = $XDG_STATE_HOME
+else
+    let s:state_home = expand('~/.local/state')
+endif
+let &undodir = s:state_home . '/vim/undo'
