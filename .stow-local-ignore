@@ -26,6 +26,7 @@ _darcs
 
 setup.sh # dotfile setup script
 
+^/vendor$                          # vendor files; not symlinked directly
 ^/\.claude/\.mcp\.json$            # merged into ~/.claude.json, not symlinked
-^/\.claude/settings\.local\.json$  # machine-local; not symlinked today
+^/\.claude/settings\.local\.json$  # project-local; not symlinked
 ^/\.oh-my-zsh/custom/example\.zsh$ # OMZ boilerplate; avoids a spurious --adopt diff
