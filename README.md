@@ -7,52 +7,45 @@ tracked file sits at the path it should occupy in your home directory, and
 ## What's Included
 
 - [Vim](https://github.com/vim/vim) configuration with [pathogen](https://github.com/tpope/vim-pathogen), [onedark](https://github.com/joshdick/onedark.vim), and [lightline](https://github.com/itchyny/lightline.vim)
-- [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the following plugins: `git`, `fzf`, `zoxide`, [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
-- [Zoxide](https://github.com/ajeetdsouza/zoxide) as a replacement for `cd`, plus [fzf](https://github.com/junegunn/fzf) for fuzzy file finding
-- [ripgrep](https://github.com/BurntSushi/ripgrep), the [GitHub CLI](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
-- [tmux](https://github.com/tmux/tmux) with [TPM](https://github.com/tmux-plugins/tpm) using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) + [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configuration: shared global instructions, MCP servers, custom skills, policy hooks, and a custom statusline
+- [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the plugins: `git`, [fzf](https://github.com/junegunn/fzf), [zoxide](https://github.com/ajeetdsouza/zoxide), [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
+- [ripgrep](https://github.com/BurntSushi/ripgrep), [GitHub CLI (gh)](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
+- [tmux](https://github.com/tmux/tmux) with basic QOL configs, and [TPM](https://github.com/tmux-plugins/tpm) using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) + [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configured with global CLAUDE.md, MCP servers, custom skills, hooks, and a custom statusline
 - [llama.cpp](https://github.com/ggml-org/llama.cpp) build pipeline and serving utilities
 
 ## Requirements
 
 - Linux (developed/deployed on Ubuntu WSL)
 - [Homebrew](https://brew.sh) installed (Linuxbrew)
-- `git` on `PATH`
+- `curl` and `git` on `PATH`
 
-Everything else — GNU Stow, the CLI tools, Oh My Zsh, and Claude Code — is
-installed by `setup.sh`. **No root and no host package manager** required:
-`setup.sh` is 100% sudo-free and never touches `apt`.
+Everything else is installed by `setup.sh`. **No root required**
 
 ## Quick Start
 
 ```bash
 cd "$HOME"
-git clone --recursive git@github.com:ekatiyar/dotfiles.git
+git clone git@github.com:ekatiyar/dotfiles.git
 ./dotfiles/setup.sh
 gh auth login
 exec zsh
 ```
 
-Then, inside tmux, press `prefix+I` once to have TPM install tmux-resurrect
-and tmux-continuum.
+For tmux, press `prefix+I` once to have TPM install tmux-resurrect and tmux-continuum.
 
 `setup.sh` is idempotent — re-run it any time to pick up new tools or re-link
 config; already-installed steps report skips/no-ops.
 
 ## What setup.sh does
 
-Tools are installed **first**, then Stow runs **once** so it links leaf files
-into the real directories those tools create.
-
-1. **Preflight** — checks for `brew` and `git` on `PATH`; pre-create certain folders
+1. **Preflight** — checks for `brew`, `curl`, and `git` on `PATH`; pre-create certain folders
    to prevent Stow from symlinking at too high a directory level
-2. **Submodules** — `git submodule update --init --remote` (vim bundles, zsh plugins, tpm).
+2. **Submodules** — `git submodule update --init --remote` (vim bundles, zsh plugins, tpm, skills).
 3. **CLI tools** — `brew install`
-4. **Oh My Zsh** — official installer with `KEEP_ZSHRC=yes` (leaves rc files for Stow).
-5. **Claude Code** — native installer (`curl … claude.ai/install.sh`).
-6. **Clean legacy links** — remove stale absolute symlinks pointing into the repo.
-7. **Stow** — single `stow --adopt --restow` pass links everything.
+4. **Oh My Zsh** — runs official installer
+5. **Claude Code** — runs native installer
+6. **Clean legacy links** — removes any absolute symlinks that will conflict with stow
+7. **Symlink w/ Stow**
 8. **Review** — print any files `--adopt` imported, for git review.
 9. **MCP merge** — deep-merge `.claude/.mcp.json` into `~/.claude.json`
 10. **Next steps**
@@ -65,13 +58,13 @@ The whole repo is a single Stow package. Install runs:
 stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 ```
 
-- `--restow` re-links cleanly on every run (idempotent).
-- `--adopt` imports any pre-existing **real** file in `$HOME` into the repo
-  rather than failing or deleting it. Adopted files surface as uncommitted
-  changes.
+- This re-links cleanly on every run (idempotent), and imports any pre-existing **real** 
+  file in `$HOME` into the repo rather than failing or deleting it. Adopted files surface 
+  as uncommitted changes.
 - `.stow-local-ignore` includes Stow's default ignore list and a few others:
   - `setup.sh` — the bootstrap script itself
   - `.secrets` — machine-local secrets
+  - `vendor` — vendor files which shouldn't be symlinked directly
   - `.claude/.mcp.json` — merged into `~/.claude.json`
   - `.claude/settings.local.json` — project-local
   - `.oh-my-zsh/custom/example.zsh` — comes w/ Oh My Zsh install 
@@ -88,6 +81,10 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 - `.llama_functions` — `llmb` and `llama-router` bash functions
 - `.zshrc` — Oh My Zsh, plugins
 - `.tmux.conf` — configures shell as `zsh`, provides basic QOL configs, and loads TPM plugins
+
+### Agent Skills
+- Third-party skills come from upstream repos checked out as submodules under
+`vendor/`, symlinked into `.claude/skills/`
 
 ## Local LLM & Claude Integration
 
