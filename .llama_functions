@@ -1,4 +1,4 @@
-# Fixed Qwen 3.5/3.6 chat template (froggeric v21+)
+# Fixed Qwen 3.5/3.6/3.8 chat template (froggeric v22.4+)
 _llama_sync_qwen_template() {
     local url="https://huggingface.co/froggeric/Qwen-Fixed-Chat-Templates/resolve/main/chat_template.jinja"
     local dest="${LLAMA_CACHE:-$HOME/repo/models}/templates/qwen-fixed-chat-template.jinja"
