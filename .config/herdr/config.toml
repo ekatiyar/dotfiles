@@ -11,3 +11,7 @@ delivery = "herdr"
 
 [ui.sound]
 enabled = false
+
+[theme]
+name = "kanagawa"
+auto_switch = false
