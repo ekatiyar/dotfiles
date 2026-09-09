@@ -9,7 +9,8 @@ tracked file sits at the path it should occupy in your home directory, and
 - [Vim](https://github.com/vim/vim) configuration with [pathogen](https://github.com/tpope/vim-pathogen), [onedark](https://github.com/joshdick/onedark.vim), and [lightline](https://github.com/itchyny/lightline.vim)
 - [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the plugins: `git`, [fzf](https://github.com/junegunn/fzf), [zoxide](https://github.com/ajeetdsouza/zoxide), [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
 - [ripgrep](https://github.com/BurntSushi/ripgrep), [GitHub CLI (gh)](https://cli.github.com/), and [tealdeer](https://github.com/dbrgn/tealdeer) (`tldr`)
-- [tmux](https://github.com/tmux/tmux) with basic QOL configs, and [TPM](https://github.com/tmux-plugins/tpm) using [tmux-resurrect](https://github.com/tmux-plugins/tmux-resurrect) + [tmux-continuum](https://github.com/tmux-plugins/tmux-continuum)
+- [tmux](https://github.com/tmux/tmux) with basic QOL configs
+- [herdr](https://github.com/herdrdev/herdr)
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configured with global CLAUDE.md, MCP servers, custom skills, hooks, and a custom statusline
 - [llama.cpp](https://github.com/ggml-org/llama.cpp) build pipeline and serving utilities
 
@@ -31,8 +32,6 @@ gh auth login
 exec zsh
 ```
 
-For tmux, press `prefix+I` once to have TPM install tmux-resurrect and tmux-continuum.
-
 `setup.sh` is idempotent — re-run it any time to pick up new tools or re-link
 config; already-installed steps report skips/no-ops.
 
@@ -40,7 +39,7 @@ config; already-installed steps report skips/no-ops.
 
 1. **Preflight** — checks for `brew`, `curl`, and `git` on `PATH`; pre-create certain folders
    to prevent Stow from symlinking at too high a directory level
-2. **Submodules** — `git submodule update --init --remote` (vim bundles, zsh plugins, tpm, skills).
+2. **Submodules** — `git submodule update --init --remote` (vim bundles, zsh plugins, skills).
 3. **CLI tools** — `brew install`
 4. **Oh My Zsh** — runs official installer
 5. **Claude Code** — runs native installer
@@ -80,7 +79,9 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
   `git branch -v`, alias-aware `watch`, and a helper to execute saved Claude Code plans
 - `.llama_functions` — `llmb` and `llama-router` bash functions
 - `.zshrc` — Oh My Zsh, plugins
-- `.tmux.conf` — configures shell as `zsh`, provides basic QOL configs, and loads TPM plugins
+- `.tmux.conf` — configures shell as `zsh`, provides basic QOL configs
+- `.config/herdr/config.toml` — sets `zsh` shell, configures similar
+  defaults to tmux and basic QOL configs
 
 ### Agent Skills
 - Third-party skills come from upstream repos checked out as submodules under
