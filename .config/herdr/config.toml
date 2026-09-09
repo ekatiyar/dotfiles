@@ -1,0 +1,13 @@
+onboarding = false
+[terminal]
+default_shell = "zsh"
+
+[keys]
+split_vertical = "prefix+|"
+split_horizontal = "prefix+_"
+
+[ui.toast]
+delivery = "herdr"
+
+[ui.sound]
+enabled = false
