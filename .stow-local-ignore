@@ -30,3 +30,4 @@ setup.sh # dotfile setup script
 ^/\.claude/\.mcp\.json$            # merged into ~/.claude.json, not symlinked
 ^/\.claude/settings\.local\.json$  # project-local; not symlinked
 ^/\.oh-my-zsh/custom/example\.zsh$ # OMZ boilerplate; avoids a spurious --adopt diff
+^/\.claude/hooks/herdr-agent-state\.sh$ # managed by herdr; overwritten on reinstall
