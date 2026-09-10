@@ -99,12 +99,12 @@ update_submodules() {
   fi
 }
 
-# 3. install_tools — brew install the full CLI set. tealdeer provides `tldr`;
-#    jq is needed by sync_mcp; zsh is the login shell, and  fzf's install script
+# 3. install_tools — brew install the full CLI set. jq is needed by sync_mcp;
+#    zsh is the login shell, and fzf's install script
 #    generates ~/.fzf.{bash,zsh} without editing the soon-to-be-symlinked rc files.
 install_tools() {
   log "Installing CLI tools via Homebrew"
-  brew_install stow zoxide fzf ripgrep gh tealdeer jq zsh github-mcp-server tmux herdr uv
+  brew_install stow zoxide fzf ripgrep gh jq zsh github-mcp-server tmux herdr uv
 
   if [ ! -f "$HOME/.fzf.bash" ] || [ ! -f "$HOME/.fzf.zsh" ]; then
     log "Generating fzf key-bindings and completion (~/.fzf.{bash,zsh})"
@@ -416,4 +416,6 @@ main() {
   next_steps
 }
 
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
