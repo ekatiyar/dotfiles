@@ -35,7 +35,9 @@
       "Bash(git rev-list:*)",
       "Bash(git rev-parse:*)",
       "Bash(git show:*)",
-      "Bash(git status *)",
+      "Bash(git stash list:*)",
+      "Bash(git stash show:*)",
+      "Bash(git status:*)",
       "Bash(grep:*)",
       "Bash(head:*)",
       "Bash(jq:*)",
@@ -96,20 +98,21 @@
       "mcp__github__update_pull_request_branch"
     ],
     "ask": [
-      "Bash(git*branch -D*)",
-      "Bash(git*branch -d*)",
-      "Bash(git*checkout -- *)",
-      "Bash(git*clean*)",
-      "Bash(git*commit*)",
-      "Bash(git*merge*)",
-      "Bash(git*push*)",
-      "Bash(git*rebase*)",
-      "Bash(git*reset*)",
-      "Bash(git*restore*)",
-      "Bash(git*stash*)",
-      "Bash(git*tag*)",
-      "Bash(git*worktree prune*)",
-      "Bash(git*worktree remove*)",
+      "Bash(git* branch -D*)",
+      "Bash(git* branch -d*)",
+      "Bash(git* checkout -- *)",
+      "Bash(git* clean*)",
+      "Bash(git* commit*)",
+      "Bash(git* merge)",
+      "Bash(git* merge *)",
+      "Bash(git* push*)",
+      "Bash(git* rebase*)",
+      "Bash(git* reset*)",
+      "Bash(git* restore*)",
+      "Bash(git* stash*)",
+      "Bash(git* tag*)",
+      "Bash(git* worktree prune*)",
+      "Bash(git* worktree remove*)",
       "Bash(gh api:*)",
       "Bash(kill:*)",
       "Bash(pkill:*)",
@@ -163,6 +166,16 @@
             "command": "bash ~/.claude/hooks/fable-orchestrator.sh"
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/home/easha/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },
@@ -179,8 +192,8 @@
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": true,
   "outputStyle": "Plainspoken",
+  "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
@@ -194,5 +207,6 @@
   "autoCompactEnabled": false,
   "switchModelsOnFlag": false,
   "teammateMode": "auto",
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "enableArtifact": false
 }

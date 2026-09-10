@@ -26,16 +26,16 @@ check() { # expected json label
   fi
 }
 
-# Unset/inherit/fable on a known type -> auto-assigned.
+# Unset/inherit on a known type -> auto-assigned.
 check allow:sonnet '{"tool_input":{"subagent_type":"Explore"}}'                              'Explore, no model'
 check allow:sonnet '{"tool_input":{"subagent_type":"claude-code-guide","model":"inherit"}}'  'guide, inherit'
 check allow:opus   '{"tool_input":{"subagent_type":"Plan","model":""}}'                      'Plan, empty'
-check allow:opus   '{"tool_input":{"subagent_type":"Plan","model":"fable"}}'                 'Plan, fable overridden'
 # Unknown type without an explicit model -> denied.
 check deny         '{"tool_input":{"subagent_type":"general-purpose"}}'                       'unknown type, no model'
-check deny         '{"tool_input":{"subagent_type":"general-purpose","model":"fable"}}'       'unknown type, fable'
-# Deliberate non-fable model -> left untouched (silent passthrough).
+# Deliberate model choice -> left untouched (silent passthrough).
 check silent       '{"tool_input":{"subagent_type":"general-purpose","model":"opus"}}'        'explicit opus passthrough'
 check silent       '{"tool_input":{"subagent_type":"Explore","model":"haiku"}}'               'explicit haiku passthrough'
+check silent       '{"tool_input":{"subagent_type":"Plan","model":"fable"}}'                  'explicit fable passthrough'
+check silent       '{"tool_input":{"subagent_type":"general-purpose","model":"fable"}}'       'unknown type, explicit fable'
 
 summary

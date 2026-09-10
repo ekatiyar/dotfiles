@@ -76,15 +76,11 @@ preflight() {
   mkdir -p "$LOCAL_BIN"
   export PATH="$LOCAL_BIN:$PATH"
 
-  # Pre-create the runtime dir as a REAL dir so the single stow pass descends
+  # Pre-create the runtime dirs as a REAL dir so the single stow pass descends
   # into it and links the leaf files, instead of folding the whole dir.
-  mkdir -p "$HOME/.claude"
-
-  # Same reasoning: keep ~/.tmux/plugins real so stow only links the tpm
-  # leaf, leaving room for TPM to clone tmux-resurrect/continuum alongside it.
-  mkdir -p "$HOME/.tmux/plugins"
-
+  mkdir -p "$HOME/.claude/hooks"
   mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/vim/undo"
+  mkdir -p "$HOME/.config/herdr"
 }
 
 # 2. submodules — external dependencies must exist before stow links them.
@@ -103,13 +99,12 @@ update_submodules() {
   fi
 }
 
-# 3. install_tools — brew install the full CLI set. tealdeer provides `tldr`;
-#    jq is needed by sync_mcp; zsh is the login shell (.tmux.conf and next_steps
-#    both expect it on PATH). fzf's install script generates ~/.fzf.{bash,zsh}
-#    without editing the soon-to-be-symlinked rc files.
+# 3. install_tools — brew install the full CLI set. jq is needed by sync_mcp;
+#    zsh is the login shell, and fzf's install script
+#    generates ~/.fzf.{bash,zsh} without editing the soon-to-be-symlinked rc files.
 install_tools() {
   log "Installing CLI tools via Homebrew"
-  brew_install stow zoxide fzf ripgrep gh tealdeer jq zsh github-mcp-server tmux uv
+  brew_install stow zoxide fzf ripgrep gh jq zsh github-mcp-server tmux herdr uv
 
   if [ ! -f "$HOME/.fzf.bash" ] || [ ! -f "$HOME/.fzf.zsh" ]; then
     log "Generating fzf key-bindings and completion (~/.fzf.{bash,zsh})"
@@ -395,9 +390,6 @@ next_steps() {
   2. Start a fresh shell to load Oh My Zsh, plugins, and aliases:
        exec zsh
 
-  3. Install tmux plugins (tmux-resurrect, tmux-continuum):
-       open tmux, then press <prefix> + I
-
 EOF
 }
 
@@ -424,4 +416,6 @@ main() {
   next_steps
 }
 
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then main "$@"; fi
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi

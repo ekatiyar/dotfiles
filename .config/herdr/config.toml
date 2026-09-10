@@ -1,0 +1,44 @@
+onboarding = false
+
+[terminal]
+default_shell = "zsh"
+
+[theme]
+name = "kanagawa"
+auto_switch = false
+
+[ui]
+prompt_new_tab_name = false
+pane_outer_borders = false
+pane_gaps = false
+tab_bar_position = "bottom"
+
+[ui.toast]
+delivery = "herdr"
+
+[keys]
+detach = "prefix+d"
+last_pane = "prefix+l"
+focus_agent = "prefix+alt+1..9"
+
+focus_pane_left = "prefix+left"
+focus_pane_down = "prefix+down"
+focus_pane_up = "prefix+up"
+focus_pane_right = "prefix+right"
+
+split_vertical = "prefix+|"
+split_horizontal = "prefix+_"
+
+# Move the current pane into a new tab.
+[[keys.command]]
+key = "prefix+!"
+type = "shell"
+command = "herdr pane move \"$HERDR_ACTIVE_PANE_ID\" --new-tab --focus"
+
+# Join a pane in side-by-side from another workspace/tab
+[[keys.command]]
+key = "prefix+j"
+type = "popup"
+width = "60%"
+height = "60%"
+command = "bash ~/.config/herdr/scripts/join-pane.sh"
