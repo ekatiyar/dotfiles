@@ -89,6 +89,7 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 
 - `.claude/skills/` is the single source of truth for Codex too. The repo
   commits a relative symlink `.agents/skills → ../.claude/skills`.
+
 ## Local LLM & Claude Integration
 
 - `llmb` — pulls latest and builds `llama-cli`/`llama-server`
