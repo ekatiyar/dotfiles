@@ -1,6 +1,7 @@
 ---
 name: orchestrator
 description: Trigger when planning how/what to delegate, or when told to orchestrate, subagents.
+disable-model-invocation: true
 ---
 
 # Orchestrator
