@@ -144,6 +144,10 @@ add_to_path "$HOME/bin"
 
 export PATH
 
+if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env --shell bash)"
+fi
+
 # User specific aliases and functions
 alias claude='claude --mcp-config "$HOME/.claude/.mcp.json"'
 

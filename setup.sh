@@ -103,7 +103,7 @@ update_submodules() {
 # ~/.fzf.{bash,zsh} without editing the soon-to-be-symlinked rc files.
 install_tools() {
   log "Installing CLI tools via Homebrew"
-  brew_install stow zoxide fzf ripgrep gh jq zsh github-mcp-server tmux herdr uv
+  brew_install stow zoxide fzf ripgrep gh jq zsh github-mcp-server tmux herdr uv fnm
 
   if [ ! -f "$HOME/.fzf.bash" ] || [ ! -f "$HOME/.fzf.zsh" ]; then
     log "Generating fzf key-bindings and completion (~/.fzf.{bash,zsh})"
