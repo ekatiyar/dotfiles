@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Pick a pane from another tab and join it into the current one, side by side.
+# Pick a pane from another tab and join it into the current one. Enter splits
+# vertically (side by side), ctrl-enter horizontally (stacked).
 set -uo pipefail
 
 tab="${HERDR_ACTIVE_TAB_ID:-${HERDR_TAB_ID:-}}"
@@ -31,15 +32,19 @@ rows=$(herdr api snapshot | jq -r --arg t "$tab" --arg h "$HOME" '
   | .[]
   | "\(.[0])\t\(.[1] | pad($wloc))  \(.[2] | pad($wcwd))  \(.[3])"')
 
-picked=$(printf '%s' "$rows" | fzf \
+out=$(printf '%s' "$rows" | fzf \
   --delimiter=$'\t' --with-nth 2.. --accept-nth 1 \
   --layout=reverse --no-sort --cycle --info=inline-right \
   --prompt 'join> ' \
-  --footer 'ctrl-p: toggle preview' \
+  --expect=ctrl-j \
+  --footer 'enter: vertical | ctrl-enter: horizontal | ctrl-p: toggle preview' \
   --preview 'herdr pane read {1} --source recent-unwrapped --lines 60' \
   --preview-window 'down,60%,hidden,follow' \
   --bind 'ctrl-p:toggle-preview')
 
+{ read -r key; read -r picked; } <<<"$out"
 picked=${picked%%$'\t'*}
 [ -n "$picked" ] || exit 0
-herdr pane move "$picked" --tab "$tab" --split right --target-pane "$pane" --focus
+
+[ "$key" = ctrl-j ] && split=down || split=right
+herdr pane move "$picked" --tab "$tab" --split "$split" --target-pane "$pane" --focus

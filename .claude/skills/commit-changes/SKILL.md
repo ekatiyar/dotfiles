@@ -22,6 +22,6 @@ disable-model-invocation: true
 
 5. **Execute** each approved group in order with `git commit -m "<message>" -- <paths>`, which commits those paths' working-tree content and leaves the rest of the index untouched.
 
-   **DO NOT** push, pass `--no-verify`, amend, or rebase. On any hook or test failure, stop and report the exact error.
+   **DO NOT** push, pass `--no-verify`, amend, or rebase. On any failure, stop and report the error.
 
 6. **Report** `git log --oneline -N` (N = number of groups) and confirm every commit carries the approved order and message, and that `git diff --staged` is empty.

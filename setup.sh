@@ -76,9 +76,9 @@ preflight() {
   mkdir -p "$LOCAL_BIN"
   export PATH="$LOCAL_BIN:$PATH"
 
-  # Pre-create the runtime dirs as a REAL dir so the single stow pass descends
-  # into it and links the leaf files, instead of folding the whole dir.
-  mkdir -p "$HOME/.claude/hooks"
+  # Pre-create runtime dirs as REAL dirs so the single stow pass descends into
+  # them and links leaf files instead of folding the whole directory.
+  mkdir -p "$HOME/.claude/hooks" "$HOME/.codex" "$HOME/.agents"
   mkdir -p "${XDG_STATE_HOME:-$HOME/.local/state}/vim/undo"
   mkdir -p "$HOME/.config/herdr"
 }
@@ -151,7 +151,13 @@ install_claude() {
   curl -fsSL https://claude.ai/install.sh | bash
 }
 
-# 6. clean_legacy_links — stow only manages RELATIVE symlinks; it ignores
+# 6. install_codex — update in place without prompting or launching Codex.
+install_codex() {
+  log "Installing/updating Codex (native installer)"
+  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
+}
+
+# 7. clean_legacy_links — stow only manages RELATIVE symlinks; it ignores
 #    absolute ones (and neither --override nor --adopt reclaims them). The old
 #    manual setup created absolute links, so delete any home symlink whose
 #    target is absolute and points into THIS repo, letting the stow pass
@@ -180,28 +186,33 @@ clean_legacy_links() {
   eval "$_shopt_save"
 }
 
-# 7. run_stow — the single symlink pass. Stow dir = the repo, target = $HOME
+# 8. run_stow — the single symlink pass. Stow dir = the repo, target = $HOME
 #    (distinct paths); package = ".". Tools above created their real dirs and
 #    preflight pre-created runtime dirs, so stow descends and links leaf files.
 #    --adopt imports any pre-existing real home files (reviewed via git, never
 #    deleted); --restow re-links cleanly on re-runs.
 run_stow() {
   log "Running stow (single pass, --adopt --restow)"
+  # Keep review_adopt focused on changes introduced by this Stow pass.
+  PRE_STOW_STATUS="$(git -C "$DOTFILES_DIR" status --short)"
   stow --dir="$DOTFILES_DIR" --target="$HOME" \
        --adopt --restow --verbose=1 .
 }
 
-# 8. review_adopt — surface anything --adopt pulled into the repo.
+# 9. review_adopt — surface anything --adopt pulled into the repo.
 review_adopt() {
-  local changes
-  changes="$(git -C "$DOTFILES_DIR" status --short --ignore-submodules=all)"
-  if [ -n "$changes" ]; then
+  local adopted
+  adopted="$(comm -13 \
+    <(printf '%s\n' "${PRE_STOW_STATUS:-}" | sort) \
+    <(git -C "$DOTFILES_DIR" status --short | sort) \
+    | sed '/^$/d')"
+  if [ -n "$adopted" ]; then
     warn "stow --adopt imported pre-existing home files into the repo."
     warn "Review and restore intended versions:"
     warn "  git -C \"$DOTFILES_DIR\" status"
     warn "  git -C \"$DOTFILES_DIR\" diff"
     warn "  git -C \"$DOTFILES_DIR\" checkout -- <path>   # to discard an adoption"
-    printf '%s\n' "$changes" >&2
+    printf '%s\n' "$adopted" >&2
   else
     log "No files adopted; working tree clean"
   fi
@@ -248,7 +259,7 @@ _sync_mcp_build_buffer() {
   printf '}\n'
 }
 
-# 9. sync_mcp — interactive deep-merge of repo .mcp.json ↔ ~/.claude.json.
+# 10. sync_mcp — interactive deep-merge of repo .mcp.json ↔ ~/.claude.json.
 #    Identical/single-source servers are auto-included; conflicting values open
 #    an editor with git-style conflict markers. Writes back to BOTH files atomically.
 #    Skips (idempotent) when the merged result already matches both sources.
@@ -378,7 +389,7 @@ sync_mcp() {
   fi
 }
 
-# 10. next_steps — manual, auth-bound follow-ups.
+# 11. next_steps — manual, auth-bound follow-ups.
 next_steps() {
   cat <<'EOF'
 
@@ -409,6 +420,7 @@ main() {
   install_tools
   install_omz
   install_claude
+  install_codex
   clean_legacy_links
   run_stow
   review_adopt
