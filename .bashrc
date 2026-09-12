@@ -146,7 +146,12 @@ add_to_path "/home/linuxbrew/.linuxbrew/opt/rustup/bin"
 
 export PATH
 
+if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env --shell bash)"
+fi
+
 # User specific aliases and functions
+alias claude='claude --mcp-config "$HOME/.claude/.mcp.json"'
 alias lclclaude='CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1" CLAUDE_CODE_ATTRIBUTION_HEADER="0" ANTHROPIC_BASE_URL="http://127.0.0.1:8080" ANTHROPIC_API_KEY="local_token" ANTHROPIC_MODEL="opus" ANTHROPIC_DEFAULT_FABLE_MODEL="qwen3.8-27b" ANTHROPIC_DEFAULT_OPUS_MODEL="qwen3.8-27b" ANTHROPIC_DEFAULT_SONNET_MODEL="qwen3.8-27b" ANTHROPIC_DEFAULT_HAIKU_MODEL="qwen3.5-4b" CLAUDE_CODE_DISABLE_1M_CONTEXT="1" claude --exclude-dynamic-system-prompt-sections --effort high --settings '"'"'{"permissions":{"disableAutoMode":"disable"}}'"'"''
 
 if [ -f ~/.bash_functions ]; then
