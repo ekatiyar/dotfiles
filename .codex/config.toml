@@ -68,6 +68,9 @@ disabled_tools = [
 [projects."/home/easha/dotfiles"]
 trust_level = "trusted"
 
+[projects."/home/easha/repo/tbtt"]
+trust_level = "trusted"
+
 [hooks.state]
 
 [hooks.state."/home/easha/.codex/hooks.json:session_start:0:0"]
