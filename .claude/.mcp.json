@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "duckduckgo-search": {
-      "command": "uvx",
-      "args": [
-        "duckduckgo-mcp-server"
-      ]
-    },
     "github": {
       "command": "github-mcp-server",
       "args": [
