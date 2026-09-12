@@ -50,3 +50,12 @@ disabled_tools = [
     "update_pull_request",
     "update_pull_request_branch",
 ]
+
+[projects."/home/easha/dotfiles"]
+trust_level = "trusted"
+
+[hooks.state]
+
+[hooks.state."/home/easha/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:42b806f0a65946e675402e83c97899c706cb17b2276253809ffe9c3423def543"
+enabled = true
