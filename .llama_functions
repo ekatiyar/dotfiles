@@ -54,7 +54,7 @@ llama-router() {
     trap '[ -n "$gpu_pid" ] && kill "$gpu_pid" 2>/dev/null' INT TERM
 
     # Foreground pipeline: llama-server receives Ctrl+C/etc. directly, same as running it unwrapped.
-    ./llama-server --models-preset ~/.config/llama.cpp/preset.ini --models-max 1 "$@" 2>&1 | tee -a "$LOGFILE"
+    ./llama-server --models-preset ~/.config/llama.cpp/preset.ini --models-max 2 "$@" 2>&1 | tee -a "$LOGFILE"
 
     [ -n "$gpu_pid" ] && kill "$gpu_pid" 2>/dev/null
     trap - INT TERM
