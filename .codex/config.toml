@@ -1,0 +1,52 @@
+# Core
+model = "gpt-5.6-sol"
+personality = "pragmatic"
+model_reasoning_effort = "high"
+plan_mode_reasoning_effort = "xhigh"
+notify = ["bash", "-lc", "printf '\\007' > /dev/tty"]
+
+# Behavior
+[features]
+hooks = true
+memories = false
+
+[analytics]
+enabled = false
+
+[notice]
+fast_default_opt_out = true
+
+# Terminal UI/UX
+[tui]
+auto_recap = false
+notifications = ["approval-requested"]
+notification_method = "bel"
+status_line = ["current-dir", "git-branch", "model-with-reasoning", "context-used", "thread-credits", "estimated-thread-cost"]
+status_line_use_colors = true
+
+[tui.keymap.chat]
+next_permission_mode = "alt-p"
+
+# MCP servers
+[mcp_servers.github]
+command = "github-mcp-server"
+args = ["stdio"]
+env_vars = ["GITHUB_PERSONAL_ACCESS_TOKEN"]
+default_tools_approval_mode = "writes"
+disabled_tools = [
+    "add_issue_comment",
+    "assign_copilot_to_issue",
+    "create_branch",
+    "create_or_update_file",
+    "create_pull_request",
+    "create_repository",
+    "delete_file",
+    "fork_repository",
+    "issue_write",
+    "merge_pull_request",
+    "push_files",
+    "request_copilot_review",
+    "sub_issue_write",
+    "update_pull_request",
+    "update_pull_request_branch",
+]

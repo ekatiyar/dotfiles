@@ -1,0 +1,14 @@
+# Sourced by non-interactive bash via BASH_ENV when launched under Codex.
+shopt -s expand_aliases
+
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init bash)"
+fi
+
+if [ -f "$HOME/.bash_aliases" ]; then
+    . "$HOME/.bash_aliases"
+fi
+
+if [ -f "$HOME/.bash_functions" ]; then
+    . "$HOME/.bash_functions"
+fi
