@@ -1,117 +1,64 @@
 #!/bin/bash
+# Renders the main statusline. Every value but the git branch comes straight
+# from the harness payload on stdin (fields: code.claude.com/docs/en/statusline),
+# so this reads no transcripts. Segments with no data drop out.
 input=$(cat)
 
 _here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Extract all values in a single jq call. Unit-separator delimited: unlike tab,
-# \x1f is not IFS-whitespace, so empty fields survive the read without shifting.
-IFS=$'\x1f' read -r cwd model effort ctx_pct total_s tok transcript_path ctx_c \
-  rate_5h reset_5h rate_5h_c rate_7d reset_7d rate_7d_c < <(
-  echo "$input" | jq -r -L "$_here" '
-    include "statusline-lib";
-    .context_window as $ctx |
-    ($ctx.current_usage // {}) as $cu |
-    (($cu.input_tokens // 0) + ($cu.cache_read_input_tokens // 0)
-      + ($cu.cache_creation_input_tokens // 0)) as $actual |
-    (.rate_limits.five_hour // {}) as $r5 |
-    (.rate_limits.seven_day // {}) as $r7 |
-    [
-      (.cwd // ""),
-      ((.model | if type == "object" then .display_name // .id else . end) // ""
-        | sub(" *\\([^)]*\\)$"; "")),
-      (.effort.level // "-"),
-      ($ctx.used_percentage // 0 | floor),
-      (($ctx.context_window_size // 0) | fmt),
-      (if $actual > 0 then $actual | fmt else "0" end),
-      (.transcript_path // ""),
-      ctx_color($ctx.used_percentage // 0 | floor),
-      (if $r5.used_percentage != null then ($r5.used_percentage | floor) else "" end),
-      ($r5.resets_at // ""),
-      (if $r5.used_percentage != null then pct_color($r5.used_percentage | floor) else "" end),
-      (if $r7.used_percentage != null then ($r7.used_percentage | floor) else "" end),
-      ($r7.resets_at // ""),
-      (if $r7.used_percentage != null then pct_color($r7.used_percentage | floor) else "" end)
-    ] | map(tostring) | join("\u001f")'
-)
-
-# Aggregate cost from the transcript and any subagent transcripts.
-# An empty cost hides the segment; failures are silent by design.
-if [ -n "$transcript_path" ] && [ -r "$transcript_path" ]; then
-  _session_dir="${transcript_path%.jsonl}"
-  shopt -s nullglob
-  _cost_files=("$transcript_path" "${_session_dir}/subagents"/agent-*.jsonl)
-
-  # tmux-pane teammates (agent-team) are separate top-level sessions, not under
-  # subagents/. The team config records no session ids, so find teammate
-  # transcripts by the teamName marker they each carry near the top.
-  _proj_dir="${transcript_path%/*}"
-  _session_id="${transcript_path##*/}"; _session_id="${_session_id%.jsonl}"
-  _team_name="session-${_session_id:0:8}"
-  _team_cfg="${_proj_dir%/projects/*}/teams/${_team_name}/config.json"
-  if [ -r "$_team_cfg" ]; then
-    while IFS= read -r _tf; do
-      _tid="${_tf##*/}"; _tid="${_tid%.jsonl}"
-      _cost_files+=("$_tf")
-      _cost_files+=("$_proj_dir/$_tid/subagents"/agent-*.jsonl)
-    done < <(grep -l -m1 -F "\"teamName\":\"$_team_name\"" "$_proj_dir"/*.jsonl 2>/dev/null)
-  fi
-  shopt -u nullglob
-
-  cost=$(jq -s -r -L "$_here" 'include "statusline-lib"; cost' "${_cost_files[@]}" 2>/dev/null) || cost=""
-else
-  cost=""
-fi
-
+cwd=$(jq -r '.cwd // ""' <<<"$input")
 branch=$(cd "$cwd" 2>/dev/null && git -c gc.auto=0 branch --show-current 2>/dev/null || echo '')
 
-fmt_until() {
-  local secs=$(( $1 - $(date +%s) ))
-  [ "$secs" -le 0 ] && echo "now" && return
-  local h=$(( secs / 3600 ))
-  local m=$(( (secs % 3600) / 60 ))
-  if [ "$h" -ge 24 ]; then
-    local d=$(( h / 24 ))
-    printf '%dd %dh' "$d" $(( h % 24 ))
-  elif [ "$h" -ge 1 ]; then
-    printf '%dh %dm' "$h" "$m"
-  else
-    printf '%dm' "$m"
-  fi
-}
+jq -r -L "$_here" --arg branch "$branch" '
+  include "statusline-lib";
+  "[0m"              as $R |
+  "[38;2;63;185;80m"  as $GREEN |
+  "[38;2;232;130;90m" as $PEACH |
+  "[38;2;250;200;80m" as $FOLDER |
+  ((.cwd // "") | sub(".*/"; "")) as $folder |
+  ((.model | if type == "object" then .display_name // .id else . end) // ""
+    | sub(" *\\([^)]*\\)$"; "")) as $model |
+  (.effort.level // "") as $effort |
+  (.context_window // {}) as $ctx |
+  (.prompt_cache // {}) as $pc |
+  (.cost.total_cost_usd // 0) as $cost |
+  (.rate_limits.five_hour // {}) as $r5 |
+  (.rate_limits.seven_day // {}) as $r7 |
+  ( ["\($FOLDER)\($folder)\($R)"]
 
-# Colors
-R='\033[0m'
-GREEN='\033[38;2;63;185;80m'
-PEACH='\033[38;2;232;130;90m'
-FOLDER='\033[38;2;250;200;80m'
+    + (if $branch != "" then ["\($GREEN)\($branch)\($R)"] else [] end)
 
-# Build output
-folder="${cwd##*/}"
-parts="${FOLDER}${folder}${R}"
-[ -n "$branch" ] && parts="$parts | ${GREEN}${branch}${R}"
-if [ -n "$model" ]; then
-  [ -n "$effort" ] && [ "$effort" != "-" ] && model="${model} (${effort})"
-  parts="$parts | ${PEACH}${model}${R}"
-fi
+    + (if $model != ""
+       then ["\($PEACH)\($model)\(if $effort != "" then " (\($effort))" else "" end)\($R)"]
+       else [] end)
 
-if [ "$ctx_pct" != "0" ]; then
-  parts="$parts | ctx: ${ctx_c}${ctx_pct}%${R} (${tok}/${total_s})"
-fi
+    # used_percentage is input-only, and null or fractional early in a session.
+    + (($ctx.used_percentage // 0 | floor) as $pct |
+       if $pct > 0
+       then ["ctx: \(ctx_color($pct))\($pct)%\($R) (\($ctx.total_input_tokens // 0 | fmt)/\($ctx.context_window_size // 0 | fmt))"]
+       else [] end)
 
-if [ -n "$rate_5h" ]; then
-  seg="5h: ${rate_5h_c}${rate_5h}%${R}"
-  [ -n "$reset_5h" ] && seg="$seg ($(fmt_until "$reset_5h"))"
-  parts="$parts | $seg"
-fi
-if [ -n "$rate_7d" ]; then
-  seg="7d: ${rate_7d_c}${rate_7d}%${R}"
-  [ -n "$reset_7d" ] && seg="$seg ($(fmt_until "$reset_7d"))"
-  parts="$parts | $seg"
-fi
+    + (if $cost > 0 then ["\(cost_color($cost))$\($cost | usd)\($R)"] else [] end)
 
-if [ -n "$cost" ]; then
-  CC=$(jq -rn -L "$_here" --arg c "$cost" 'include "statusline-lib"; cost_color($c | tonumber)')
-  parts="$parts | ${CC}\$${cost}${R}"
-fi
+    # hit_ratio colors the label; the value is time left before the prefix goes
+    # cold, which is the part still worth acting on.
+    + (if ($pc.hit_ratio // null) != null
+       then (($pc.expires_at // 0) - now | floor) as $left |
+            ["\(cache_color($pc.hit_ratio * 100))cache\($R) \(
+               if ($pc.warm // false) and $left > 0 then $left | dur else "cold" end)"]
+       else [] end)
 
-printf '%b' "$parts"
+    + (if ($r5.used_percentage // null) != null
+       then ($r5.used_percentage | floor) as $pct |
+            ["5h: \(pct_color($pct))\($pct)%\($R)\(
+               if ($r5.resets_at // null) != null
+               then " (\(($r5.resets_at - now) | dur))" else "" end)"]
+       else [] end)
+
+    + (if ($r7.used_percentage // null) != null
+       then ($r7.used_percentage | floor) as $pct |
+            ["7d: \(pct_color($pct))\($pct)%\($R)\(
+               if ($r7.resets_at // null) != null
+               then " (\(($r7.resets_at - now) | dur))" else "" end)"]
+       else [] end)
+  ) | join(" | ")' <<<"$input"

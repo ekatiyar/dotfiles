@@ -7,6 +7,15 @@ def fmt:
     | "\($u / 10 | floor).\($u % 10)m"
   else "\(. / 1000 | floor)k" end;
 
+# Seconds -> compact duration.
+def dur:
+  floor as $s
+  | if $s <= 0 then "now"
+    elif $s > 3600 * 24 then "\($s / 86400 | floor)d \(($s % 86400) / 3600 | floor)h"
+    elif $s > 3600 then "\($s / 3600 | floor)h \(($s % 3600) / 60 | floor)m"
+    elif $s >= 60 then "\($s / 60 | floor)m"
+    else "\($s)s" end;
+
 def short_model:
   if   test("fable")  then "Fable"
   elif test("opus")   then "Opus"
@@ -17,9 +26,9 @@ def short_model:
 # null-safe; unknown model families yield null and are skipped by `cost`.
 def rate_for(m):
   (m // "") as $s |
-  if   $s | test("fable")  then {input: 10, hit: 1.00, w5m: 12.50, w1h: 20, output: 50}
+  if   $s | test("fable")  then {input: 10, hit: 0.25, w5m: 12.50, w1h: 20, output: 50}
   elif $s | test("opus")   then {input: 5,  hit: 0.50, w5m: 6.25,  w1h: 10, output: 25}
-  elif $s | test("sonnet") then {input: 3,  hit: 0.30, w5m: 3.75,  w1h: 6,  output: 15}
+  elif $s | test("sonnet") then {input: 2,  hit: 0.20, w5m: 2.50,  w1h: 4,  output: 10}
   elif $s | test("haiku")  then {input: 1,  hit: 0.10, w5m: 1.25,  w1h: 2,  output: 5}
   else null end;
 
@@ -42,6 +51,15 @@ def cost_color(c):
   elif c < 8  then "\u001b[38;2;255;215;0m"
   elif c < 16 then "\u001b[38;2;185;242;255m"
   else             "\u001b[38;2;140;200;255m" end;
+
+# cache hit rate gradient: red -> green, floored at 70%.  Colors the word
+# "cache"; the segment shows time left on the TTL.
+def cache_color(pct):
+  (if pct < 70 then 70 else pct end) as $floored
+  | "\u001b[38;2;\((100 - $floored) * 255 / 30 | floor);\(($floored - 70) * 255 / 30 | floor);0m";
+
+# Dollar amount -> string rounded to the nearest cent.
+def usd: . * 100 | round / 100 | tostring;
 
 # Slurped input (jq -s): array of transcript json lines -> cost string ("" at 0).
 def cost:
