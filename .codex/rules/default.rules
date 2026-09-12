@@ -1,0 +1,49 @@
+prefix_rule(
+    pattern = ["sort"],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["gh", "issue", ["close", "comment", "create", "delete", "edit", "reopen"]],
+    decision = "forbidden",
+)
+
+prefix_rule(
+    pattern = ["gh", "pr", ["close", "comment", "create", "edit", "merge", "reopen", "review", "update-branch"]],
+    decision = "forbidden",
+)
+
+prefix_rule(
+    pattern = ["gh", "repo", ["create", "fork"]],
+    decision = "forbidden",
+)
+
+prefix_rule(
+    pattern = ["sudo"],
+    decision = "forbidden",
+)
+
+prefix_rule(
+    pattern = ["gh", ["issue", "release"], ["list", "view"]],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["gh", "label", "list"],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["gh", "pr", ["diff", "list", "view"]],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["gh", "repo", "view"],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["gh", "search"],
+    decision = "allow",
+)
