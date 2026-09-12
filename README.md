@@ -48,8 +48,7 @@ config; already-installed steps report skips/no-ops.
 7. **Clean legacy links** — remove any absolute symlinks that conflict with Stow
 8. **Symlink w/ Stow**
 9. **Review** — print any files `--adopt` imported, for git review.
-10. **MCP merge** — deep-merge `.claude/.mcp.json` into `~/.claude.json`
-11. **Next steps**
+10. **Next steps**
 
 ## How it's managed (GNU Stow)
 
@@ -66,7 +65,6 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
   - `setup.sh` — the bootstrap script itself
   - `.secrets` — machine-local secrets
   - `vendor` — vendor files which shouldn't be symlinked directly
-  - `.claude/.mcp.json` — merged into `~/.claude.json`
   - `.claude/settings.local.json` — project-local
 
 ## Shell layout
@@ -89,4 +87,3 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 
 - `.claude/skills/` is the single source of truth for Codex too. The repo
   commits a relative symlink `.agents/skills → ../.claude/skills`.
-

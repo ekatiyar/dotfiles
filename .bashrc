@@ -147,6 +147,8 @@ add_to_path "/home/linuxbrew/.linuxbrew/opt/rustup/bin"
 export PATH
 
 # User specific aliases and functions
+alias claude='claude --mcp-config "$HOME/.claude/.mcp.json"'
+
 if [ -f ~/.bash_functions ]; then
     . ~/.bash_functions
 fi
