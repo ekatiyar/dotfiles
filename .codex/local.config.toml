@@ -1,0 +1,11 @@
+model_provider = "llama_cpp"
+model = "qwen3.8-27b"
+model_reasoning_effort = "high"
+
+[mcp_servers.duckduckgo-search]
+command = "uvx"
+args = ["duckduckgo-mcp-server"]
+
+[mcp_servers.reddit]
+command = "uvx"
+args = ["simple-reddit-mcp"]

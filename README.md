@@ -93,6 +93,7 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 - `llmb` — pulls latest and builds `llama-cli`/`llama-server`
 - `llama-router` — serves model presets from `.config/llama.cpp/preset.ini`
 - `lclclaude` alias — routes all Claude Code model tiers to local llama.cpp presets
+- `lclcodex` alias — runs Codex through the local llama.cpp profile
 
 ### WSL tuning (one-time manual step, requires root) - NOT part of `setup.sh`
 
