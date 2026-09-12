@@ -29,16 +29,16 @@ focus_pane_right = "prefix+right"
 split_vertical = "prefix+|"
 split_horizontal = "prefix+_"
 
-# Move the current pane into a new tab.
 [[keys.command]]
 key = "prefix+!"
 type = "shell"
 command = "herdr pane move \"$HERDR_ACTIVE_PANE_ID\" --new-tab --focus"
+description = "Breakout current pane in a new tab."
 
-# Join a pane in side-by-side from another workspace/tab
 [[keys.command]]
 key = "prefix+j"
 type = "popup"
 width = "60%"
 height = "60%"
 command = "bash ~/.config/herdr/scripts/join-pane.sh"
+description = "Bring in a pane from another tab"
