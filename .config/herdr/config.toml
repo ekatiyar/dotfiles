@@ -4,13 +4,13 @@ onboarding = false
 default_shell = "zsh"
 
 [theme]
-name = "kanagawa"
 auto_switch = false
+name = "kanagawa"
 
 [ui]
-prompt_new_tab_name = false
-pane_outer_borders = false
 pane_gaps = false
+pane_outer_borders = false
+prompt_new_tab_name = false
 tab_bar_position = "bottom"
 
 [ui.toast]
@@ -18,27 +18,25 @@ delivery = "herdr"
 
 [keys]
 detach = "prefix+d"
-last_pane = "prefix+l"
 focus_agent = "prefix+alt+1..9"
-
-focus_pane_left = "prefix+left"
 focus_pane_down = "prefix+down"
-focus_pane_up = "prefix+up"
+focus_pane_left = "prefix+left"
 focus_pane_right = "prefix+right"
-
-split_vertical = "prefix+|"
+focus_pane_up = "prefix+up"
+last_pane = "prefix+l"
 split_horizontal = "prefix+_"
+split_vertical = "prefix+|"
 
 [[keys.command]]
-key = "prefix+!"
-type = "shell"
 command = "herdr pane move \"$HERDR_ACTIVE_PANE_ID\" --new-tab --focus"
 description = "Breakout current pane in a new tab."
+key = "prefix+!"
+type = "shell"
 
 [[keys.command]]
+command = "bash ~/.config/herdr/scripts/join-pane.sh"
+description = "Bring in a pane from another tab"
+height = "60%"
 key = "prefix+j"
 type = "popup"
 width = "60%"
-height = "60%"
-command = "bash ~/.config/herdr/scripts/join-pane.sh"
-description = "Bring in a pane from another tab"

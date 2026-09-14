@@ -10,7 +10,7 @@ disable-model-invocation: true
 
 1. Collect the comments added in the current diff. Leave pre-existing comments alone unless specificied otherwise by the user.
 
-2. Classify each against the code it sits on and the standard in CLAUDE.md: **delete**, **trim** (one line of "why" it survives), **changelog** (strip it, but carry the text into commit message), or **keep**. Functional directives and `TODO`/`FIXME` markers stay.
+2. Classify each against the code it sits on and the standard in AGENTS.md: **delete**, **trim** (one line of "why" it survives), **changelog** (strip it, but carry the text into commit message), or **keep**. Functional directives and `TODO`/`FIXME` markers stay.
 
 3. Present the proposed edits and **ask for approval**:
 

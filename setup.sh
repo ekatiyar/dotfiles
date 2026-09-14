@@ -140,7 +140,13 @@ install_omz() {
   RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$installer"
 }
 
-# 5. install_claude — native installer drops the binary into ~/.local/bin.
+# 5. install_codex - native installer, updates if already present
+install_codex() {
+  log "Installing/updating Codex (native installer)"
+  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
+}
+
+# 6. install_claude — native installer
 install_claude() {
   if command -v claude >/dev/null 2>&1; then
     log "Claude Code already installed; skipping"
@@ -148,12 +154,6 @@ install_claude() {
   fi
   log "Installing Claude Code (native installer)"
   curl -fsSL https://claude.ai/install.sh | bash
-}
-
-# 6. install_codex — update in place without prompting or launching Codex.
-install_codex() {
-  log "Installing/updating Codex (native installer)"
-  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 }
 
 # 7. clean_legacy_links — stow only manages RELATIVE symlinks; it ignores
@@ -247,8 +247,8 @@ main() {
   update_submodules
   install_tools
   install_omz
-  install_claude
   install_codex
+  install_claude
   clean_legacy_links
   run_stow
   review_adopt

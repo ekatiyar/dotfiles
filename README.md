@@ -11,8 +11,8 @@ tracked file sits at the path it should occupy in your home directory, and
 - [Ripgrep](https://github.com/BurntSushi/ripgrep), [GitHub CLI (gh)](https://cli.github.com/)
 - [Tmux](https://github.com/tmux/tmux) with basic QOL configs
 - [Herdr](https://herdr.dev) with basic QOL configs
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) configured with global CLAUDE.md, MCP servers, custom skills, hooks, and a custom statusline
-- [Codex](https://developers.openai.com/codex) sharing configuration from Claude Code for AGENTS.md, MCP servers, and skills
+- [Codex](https://developers.openai.com/codex) configured with AGENTS.md, MCP servers, and skills
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) sharing configuration from Codex, plus hooks and a custom statusline
 - [llama.cpp](https://github.com/ggml-org/llama.cpp) build pipeline and serving utilities
 - Rust toolchain (`rustup`/`cargo`) on `PATH`, plus the `rust-analyzer-lsp` Claude Code plugin for language support
 
@@ -44,8 +44,8 @@ config; already-installed steps report skips/no-ops.
 2. **Submodules** — `git submodule update --init --remote` (vim bundles, zsh plugins, skills)
 3. **CLI tools** — `brew install`
 4. **Oh My Zsh** — run official installer
-5. **Claude Code** — run the native installer
-6. **Codex** — run the native installer.
+5. **Codex** — run the native installer
+6. **Claude Code** — run the native installer
 7. **Clean legacy links** — remove any absolute symlinks that conflict with Stow
 8. **Symlink w/ Stow**
 9. **Review** — print any files `--adopt` imported, for git review.
@@ -72,10 +72,10 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 
 `.zshrc` sources `~/.bashrc`, so the shared shell setup lives in one place:
 
-- `.bashrc` — PATH and environment configuration plus shared shell sources.
-- `.bash_aliases` — generic aliases.
+- `.bashrc` — PATH and environment configuration plus shared shell sources
+- `.bash_aliases` — simple command aliases
 - `.bash_functions` — multi-line helpers for `iwatch` and worktree-aware Git
-  commands.
+  commands
 - `.llama_functions` — `llmb` and `llama-router` bash functions
 - `.zshrc` — Oh My Zsh and plugins
 - `.tmux.conf` — configures shell as `zsh`, provides basic QOL configs
@@ -84,11 +84,11 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
 
 ### Agent Skills
 
-- Third-party skills come from upstream repos checked out as submodules under
-  `vendor/` and are symlinked into `.claude/skills/`.
+- Third-party skills that come from upstream repos checked out as submodules under
+  `vendor/` are symlinked into `.agents/skills/` and transitively `.claude/skills/`
 
-- `.claude/skills/` is the single source of truth for Codex too. The repo
-  commits a relative symlink `.agents/skills → ../.claude/skills`.
+- `.agents/skills/` is the single source of truth for Claude Code too. The repo
+  commits a relative symlink `.claude/skills → ../.agents/skills`.
 
 ## Local LLM & Claude Integration
 
