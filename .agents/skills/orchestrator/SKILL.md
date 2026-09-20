@@ -1,13 +1,12 @@
 ---
 name: orchestrator
-description: Trigger when planning how/what to delegate, or when told to orchestrate, subagents.
-disable-model-invocation: true
+description: Trigger when planning how/what to delegate to subagents, or when told to orchestrate.
 ---
 
 # Orchestrator
 
 You should always plan and implement some changes directly, while delegating lower complexity and
-lower impact tasks to opus and sonnet subagents.
+lower impact tasks to opus/sol and sonnet/luna subagents.
 
 For example, implementation code that is going to become a permanent part of the codebase should
 be handled directly, while code that is more exploratory or experimental, basic tests, and data

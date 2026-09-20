@@ -6,7 +6,7 @@ alias ll="ls -lah"
 
 # Claude Code
 alias claude='claude --mcp-config "$HOME/.claude/.mcp.json"'
-alias fable='CLAUDE_CODE_EFFORT_LEVEL=medium claude --model fable'
+alias fable='claude --model fable --settings "{\"outputStyle\":\"default\"}"'
 alias sonnet='claude --model sonnet'
 alias rclaude='claude --settings '"'"'{"env": {"DISABLE_TELEMETRY": ""}}'"'"''
 
