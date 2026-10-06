@@ -196,7 +196,6 @@
     "command": "bash ~/.claude/subagent-statusline.sh"
   },
   "enabledPlugins": {},
-  "outputStyle": "Concise",
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "modelSettings": {
