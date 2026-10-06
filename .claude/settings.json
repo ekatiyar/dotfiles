@@ -198,7 +198,6 @@
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true
   },
-  "outputStyle": "Concise",
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
   "modelSettings": {
