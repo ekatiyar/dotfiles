@@ -11,5 +11,5 @@ note them. If a non-trivial issue would take you off-plan (the approach does not
 reveals a different root cause, or a decision the plan did not specify is required), STOP: explain
 the issue and the options, and ask how to proceed before making changes.
 
-After the plan is complete, if a review is taking place, either by yourself or through a subagent,
-do not immediately begin to make modifications. Instead, present findings to the user for approval.
+Whenever a review is taking place, either by yourself or through a subagent, do not immediately begin
+to make modifications. Instead, present findings to the user first for their approval.

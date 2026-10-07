@@ -1,6 +1,6 @@
 ---
 name: unslop
-description: Always use whenever writing or revising prose that is human facing
+description: Use whenever writing or revising prose that is human facing
 ---
 
 # Unslop
