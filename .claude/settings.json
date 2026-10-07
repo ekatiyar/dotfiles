@@ -7,7 +7,8 @@
     "DISABLE_TELEMETRY": "1",
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "_ZO_DOCTOR": "0"
   },
   "attribution": {
     "commit": "",
@@ -86,12 +87,14 @@
       "Bash(sudo:*)",
       "mcp__github__add_comment_to_pending_review",
       "mcp__github__add_issue_comment",
+      "mcp__github__add_reply_to_pull_request_comment",
       "mcp__github__assign_copilot_to_issue",
       "mcp__github__create_branch",
       "mcp__github__create_or_update_file",
       "mcp__github__create_pull_request",
       "mcp__github__create_repository",
       "mcp__github__delete_file",
+      "mcp__github__delete_repository",
       "mcp__github__fork_repository",
       "mcp__github__issue_write",
       "mcp__github__merge_pull_request",
@@ -99,17 +102,19 @@
       "mcp__github__push_files",
       "mcp__github__request_copilot_review",
       "mcp__github__sub_issue_write",
+      "mcp__github__update_issue_comment",
       "mcp__github__update_pull_request",
       "mcp__github__update_pull_request_branch"
     ],
     "ask": [
+      "Bash(gh api:*)",
       "Bash(git* branch -D*)",
       "Bash(git* branch -d*)",
       "Bash(git* checkout -- *)",
       "Bash(git* clean*)",
       "Bash(git* commit*)",
-      "Bash(git* merge)",
       "Bash(git* merge *)",
+      "Bash(git* merge)",
       "Bash(git* push*)",
       "Bash(git* rebase*)",
       "Bash(git* reset*)",
@@ -118,7 +123,6 @@
       "Bash(git* tag*)",
       "Bash(git* worktree prune*)",
       "Bash(git* worktree remove*)",
-      "Bash(gh api:*)",
       "Bash(kill:*)",
       "Bash(pkill:*)",
       "Bash(rm:*)"
@@ -134,15 +138,6 @@
           {
             "type": "command",
             "command": "bash ~/.claude/hooks/subagent-model-policy.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/sleep-wait-policy.sh"
           }
         ]
       }
@@ -203,6 +198,9 @@
   "modelSettings": {
     "fable": {
       "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high"
     }
   },
   "promptSuggestionEnabled": false,

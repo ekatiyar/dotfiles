@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Fix Failing Tests
 
-1. Run the failing tests with the project's test runner (verbose output with a short traceback where supported) to identify failures.
+1. Run the failing tests with the project's test runner to identify failures.
 2. Read ONLY the failing test files and the specific source lines referenced in tracebacks.
 3. Modify ONLY test files -- never change source/production code unless the bug is clearly in production code.
 4. Update test expectations/data to match current source behavior.
