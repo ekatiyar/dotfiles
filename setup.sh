@@ -157,10 +157,9 @@ install_claude() {
 }
 
 # 7. clean_legacy_links — stow only manages RELATIVE symlinks; it ignores
-#    absolute ones (and neither --override nor --adopt reclaims them). The old
-#    manual setup created absolute links, so delete any home symlink whose
-#    target is absolute and points into THIS repo, letting the stow pass
-#    recreate it as a relative, stow-owned link. Nothing else is touched.
+#    absolute ones (and neither --override nor --adopt reclaims them). This
+#    deletes any home symlink whose target is absolute and points into THIS
+#    repo, letting the stow pass recreate it as a relative, stow-owned link.
 clean_legacy_links() {
   log "Removing legacy absolute symlinks that point into the repo"
   local entry name target link _shopt_save
@@ -175,7 +174,7 @@ clean_legacy_links() {
         "$DOTFILES_DIR"/*) warn "  unlink $target"; rm -f "$target" ;;
       esac
     elif [ -d "$entry" ] && [ ! -L "$entry" ] && [ -d "$target" ] && [ ! -L "$target" ]; then
-      while IFS= read -r link; do    # descended real dir (~/.claude, ~/.oh-my-zsh, ...)
+      while IFS= read -r link; do    # descended real dir (~/.claude, ~/.codex, ~/.oh-my-zsh, ...)
         case "$(readlink "$link")" in
           "$DOTFILES_DIR"/*) warn "  unlink $link"; rm -f "$link" ;;
         esac
