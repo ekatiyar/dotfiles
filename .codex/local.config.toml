@@ -1,6 +1,13 @@
 model = "qwen3.8-27b"
+model_context_window = 200000
 model_provider = "llama_cpp"
 model_reasoning_effort = "high"
+web_search = "live"
+
+[model_providers.llama_cpp]
+base_url = "http://127.0.0.1:9931/v1"
+name = "llama.cpp"
+wire_api = "responses"
 
 [mcp_servers.duckduckgo-search]
 args = ["duckduckgo-mcp-server"]
