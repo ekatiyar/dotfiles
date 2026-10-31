@@ -56,24 +56,24 @@ check 'backend-work | Sonnet | ctx: 25% (50k/200k) | $2' "$(contents "$COST_IN")
 MISS_IN="{\"transcript_path\":\"$TMP/$sid.jsonl\",\"tasks\":[{\"id\":\"nope\",\"label\":\"x\",\"model\":\"claude-opus-4-8\",\"contextWindowSize\":200000,\"tokenCount\":20000}]}"
 check 'x | Opus | ctx: 10% (20k/200k)' "$(contents "$MISS_IN")" 'cost: missing transcript omits segment'
 
-# tmux-pane teammate: transcript lives TOP-LEVEL ($proj/<uuid>.jsonl), not under
+# Teammate: transcript lives TOP-LEVEL ($proj/<uuid>.jsonl), not under
 # subagents/. Resolver must fall back to matching teamName (session-<first8 of lead
 # sid> = session-0000abcd) + the task's agentName. 2,000,000 input tokens sonnet => $4.
 mate="1111beef-2222-3333-4444-555555555555"
 { printf '{"type":"user","teamName":"session-0000abcd","agentName":"cancel-fixes"}\n'
   printf '{"type":"assistant","message":{"id":"mm","model":"claude-sonnet-5","usage":{"input_tokens":2000000,"output_tokens":0}}}\n'; } > "$TMP/$mate.jsonl"
-TMUX_IN="{\"transcript_path\":\"$TMP/$sid.jsonl\",\"tasks\":[{\"id\":\"$mate\",\"label\":\"cancel-fixes\",\"model\":\"claude-opus-4-8\",\"contextWindowSize\":200000,\"tokenCount\":30000}]}"
-check 'cancel-fixes | Opus | ctx: 15% (30k/200k) | $4' "$(contents "$TMUX_IN")" 'cost: tmux teammate top-level transcript resolved'
+TEAMMATE_IN="{\"transcript_path\":\"$TMP/$sid.jsonl\",\"tasks\":[{\"id\":\"$mate\",\"label\":\"cancel-fixes\",\"model\":\"claude-opus-4-8\",\"contextWindowSize\":200000,\"tokenCount\":30000}]}"
+check 'cancel-fixes | Opus | ctx: 15% (30k/200k) | $4' "$(contents "$TEAMMATE_IN")" 'cost: teammate top-level transcript resolved'
 
 # a teammate's own nested subagents count too: +1,000,000 sonnet input => $2, total $6.
 mkdir -p "$TMP/$mate/subagents"
 printf '%s\n' '{"type":"assistant","message":{"id":"ms","model":"claude-sonnet-5","usage":{"input_tokens":1000000,"output_tokens":0}}}' > "$TMP/$mate/subagents/agent-x.jsonl"
-check 'cancel-fixes | Opus | ctx: 15% (30k/200k) | $6' "$(contents "$TMUX_IN")" 'cost: tmux teammate + its own subagents summed'
+check 'cancel-fixes | Opus | ctx: 15% (30k/200k) | $6' "$(contents "$TEAMMATE_IN")" 'cost: teammate + its own subagents summed'
 
 rm -rf "$TMP"
 
 # spaced project dir: teammate transcript paths must survive word-splitting
-TMPS=$(mktemp -d "${TMPDIR:-/tmp}/subagent sp.XXXXXX")
+TMPS=$(mktemp -d --tmpdir 'subagent sp.XXXXXX')
 sid2="2222abcd-0000-0000-0000-000000000000"
 : > "$TMPS/$sid2.jsonl"
 mate2="3333beef-2222-3333-4444-555555555555"

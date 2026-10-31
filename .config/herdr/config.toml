@@ -11,6 +11,7 @@ name = "kanagawa"
 pane_gaps = false
 pane_outer_borders = false
 prompt_new_tab_name = false
+status_indicators = "symbols"
 tab_bar_position = "bottom"
 
 [ui.toast]
@@ -24,6 +25,7 @@ focus_pane_left = "prefix+left"
 focus_pane_right = "prefix+right"
 focus_pane_up = "prefix+up"
 last_pane = "prefix+l"
+rename_tab = "prefix+comma"
 split_horizontal = "prefix+_"
 split_vertical = "prefix+|"
 
@@ -38,5 +40,13 @@ command = "bash ~/.config/herdr/scripts/join-pane.sh"
 description = "Bring in a pane from another tab"
 height = "60%"
 key = "prefix+j"
+type = "popup"
+width = "60%"
+
+[[keys.command]]
+command = "bash ~/.config/herdr/scripts/move-tab.sh"
+description = "Bring in a tab from another workspace"
+height = "60%"
+key = "prefix+m"
 type = "popup"
 width = "60%"

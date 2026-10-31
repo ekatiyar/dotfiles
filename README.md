@@ -9,7 +9,6 @@ tracked file sits at the path it should occupy in your home directory, and
 - [Vim](https://github.com/vim/vim) configuration with [pathogen](https://github.com/tpope/vim-pathogen), [onedark](https://github.com/joshdick/onedark.vim), and [lightline](https://github.com/itchyny/lightline.vim)
 - [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh) configured with the plugins: `git`, [fzf](https://github.com/junegunn/fzf), [zoxide](https://github.com/ajeetdsouza/zoxide), [you-should-use](https://github.com/MichaelAquilina/zsh-you-should-use), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting), and [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions)
 - [Ripgrep](https://github.com/BurntSushi/ripgrep), [GitHub CLI (gh)](https://cli.github.com/)
-- [Tmux](https://github.com/tmux/tmux) with basic QOL configs
 - [Herdr](https://herdr.dev) with basic QOL configs
 - [Codex](https://developers.openai.com/codex) configured with AGENTS.md, MCP servers, and skills
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) sharing configuration from Codex, plus hooks and a custom statusline
@@ -77,9 +76,8 @@ stow --dir="$HOME/dotfiles" --target="$HOME" --adopt --restow --verbose=1 .
   commands
 - `.llama_functions` — `llmb` and `llama-router` bash functions
 - `.zshrc` — Oh My Zsh and plugins
-- `.tmux.conf` — configures shell as `zsh`, provides basic QOL configs
 - `.config/herdr/config.toml` — sets the shell to `zsh` and configures layout
-  and QOL keybindings to match Tmux
+  and QOL keybindings
 
 ### Agent Skills
 
