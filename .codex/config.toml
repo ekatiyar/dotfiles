@@ -9,11 +9,6 @@ plan_mode_reasoning_effort = "high"
 [sandbox_workspace_write]
 writable_roots = ["~/.codex/plans"]
 
-[model_providers.llama_cpp]
-base_url = "http://127.0.0.1:8080/v1"
-name = "llama.cpp"
-wire_api = "responses"
-
 # Behavior
 [features]
 hooks = true
