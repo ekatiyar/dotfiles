@@ -130,6 +130,8 @@ elif [ -x "$HOME/.linuxbrew/bin/brew" ]; then
 fi
 
 # User specific environment
+export TMPDIR="${TMPDIR:-/tmp}"
+
 # Helper function to add directory to PATH if not already present
 add_to_path() {
     case ":$PATH:" in
@@ -162,7 +164,7 @@ fi
 export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git/' --ignore-vcs"
 
 # GitHub token for MCP server
-export GITHUB_TOKEN="$(gh auth token)"
+export GITHUB_PERSONAL_ACCESS_TOKEN="$(gh auth token)"
 
 # Machine-local secrets (untracked; see ~/.secrets)
 if [ -f "$HOME/.secrets" ]; then
