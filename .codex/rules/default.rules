@@ -47,3 +47,28 @@ prefix_rule(
     pattern = ["gh", "search"],
     decision = "allow",
 )
+
+prefix_rule(
+    pattern = ["gh", "run", ["list", "view", "watch"]],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["gh", "gist", "view"],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["npm", "run", ["test", "test:node", "test:ui", "test:live"]],
+    decision = "allow",
+)
+
+prefix_rule(
+    pattern = ["gh", "api"],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["git", "commit"],
+    decision = "prompt",
+)

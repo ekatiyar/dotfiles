@@ -33,6 +33,7 @@ trace_exporter = "none"
 
 [notice]
 fast_default_opt_out = true
+hide_rate_limit_model_nudge = true
 
 # Terminal UI/UX
 [tui]
