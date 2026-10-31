@@ -85,6 +85,8 @@
       "Bash(gh repo create:*)",
       "Bash(gh repo fork:*)",
       "Bash(sudo:*)",
+      "ScheduleWakeup",
+      "Workflow",
       "mcp__github__add_comment_to_pending_review",
       "mcp__github__add_issue_comment",
       "mcp__github__add_reply_to_pull_request_comment",
@@ -214,6 +216,5 @@
   "preferredNotifChannel": "terminal_bell",
   "autoCompactEnabled": false,
   "switchModelsOnFlag": false,
-  "teammateMode": "auto",
   "agentPushNotifEnabled": true
 }

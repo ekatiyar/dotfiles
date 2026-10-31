@@ -40,7 +40,7 @@ while IFS= read -r task; do
     files=()
     [ -n "$id" ] && [ -r "$session_dir/subagents/agent-$id.jsonl" ] &&
       files=("$session_dir/subagents/agent-$id.jsonl")
-    # tmux-pane teammates aren't under subagents/; their transcript is top-level.
+    # Teammates can have top-level transcripts outside subagents/.
     # Look it up by agentName, then add its own nested subagents.
     if [ ${#files[@]} -eq 0 ] && [ -n "$title" ]; then
       tf="${agent_file[$title]:-}"
