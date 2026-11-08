@@ -9,7 +9,7 @@ disable-model-invocation: true
 
 1. **Find all TODOs**: scan all tracked files for case-insensitive `TODO(agent)` markers:
    ```bash
-   rg -i 'todo\(agent\)' --line-number --hidden --glob '!.git'
+   rg -i 'todo\(agent\)' --line-number --hidden --glob '!.git' .
    ```
    If none are found, stop and tell the user.
 
