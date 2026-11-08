@@ -132,6 +132,9 @@ fi
 # User specific environment
 export TMPDIR="${TMPDIR:-/tmp}"
 
+# Rebuildable caches live in a tmp directory
+export XDG_CACHE_HOME="$TMPDIR/$USER/cache"
+
 # Helper function to add directory to PATH if not already present
 add_to_path() {
     case ":$PATH:" in
