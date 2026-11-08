@@ -4,13 +4,28 @@ prefix_rule(
 )
 
 prefix_rule(
+    pattern = ["gh", ["--repo", "-R"]],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["gh", ["issue", "pr", "repo"], ["--repo", "-R"]],
+    decision = "prompt",
+)
+
+prefix_rule(
     pattern = ["gh", "issue", ["close", "comment", "create", "delete", "edit", "reopen"]],
     decision = "forbidden",
 )
 
 prefix_rule(
-    pattern = ["gh", "pr", ["close", "comment", "create", "edit", "merge", "reopen", "review", "update-branch"]],
+    pattern = ["gh", "pr", ["close", "comment", "edit", "merge", "reopen", "review", "update-branch"]],
     decision = "forbidden",
+)
+
+prefix_rule(
+    pattern = ["gh", "pr", "create"],
+    decision = "prompt",
 )
 
 prefix_rule(
@@ -69,6 +84,36 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["git", "commit"],
+    pattern = [["kill", "pkill"]],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["git", ["clean", "commit", "merge", "push", "rebase", "reset", "restore", "tag"]],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["git", "stash", ["apply", "branch", "clear", "drop", "pop", "push", "save", "store"]],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["git", "branch", ["-D", "-d"]],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["git", "checkout", "--"],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["git", "worktree", ["prune", "remove"]],
+    decision = "prompt",
+)
+
+prefix_rule(
+    pattern = ["rm"],
     decision = "prompt",
 )

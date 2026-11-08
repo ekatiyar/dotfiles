@@ -48,18 +48,20 @@ command = "github-mcp-server"
 default_tools_approval_mode = "writes"
 disabled_tools = [
     "add_issue_comment",
+    "add_reply_to_pull_request_comment",
     "assign_copilot_to_issue",
     "create_branch",
     "create_or_update_file",
-    "create_pull_request",
     "create_repository",
     "delete_file",
+    "delete_repository",
     "fork_repository",
     "issue_write",
     "merge_pull_request",
     "push_files",
     "request_copilot_review",
     "sub_issue_write",
+    "update_issue_comment",
     "update_pull_request",
     "update_pull_request_branch",
 ]
