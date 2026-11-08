@@ -5,12 +5,17 @@ notify = ["bash", "-lc", "printf '\\007' > /dev/tty"]
 personality = "pragmatic"
 plan_mode_reasoning_effort = "high"
 
+[shell_environment_policy.set]
+BASH_ENV = '$HOME/.codex/bash_env'
+
 # Plan artifacts
 [sandbox_workspace_write]
 writable_roots = ["~/.codex/plans"]
 
 # Behavior
 [features]
+# TODO: Remove once https://github.com/herdrdev/herdr/issues/4649 fixed
+daemon_auto_start = false
 hooks = true
 memories = false
 
