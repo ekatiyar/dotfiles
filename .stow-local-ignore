@@ -26,9 +26,12 @@ _darcs
 
 setup.sh # dotfile setup script
 
-^/vendor$                          # vendor files; not symlinked directly
+^/vendor$                          # vendor files
 ^/\.claude/hooks/herdr-agent-state\.sh$ # generated and managed by Herdr
-^/\.claude/settings\.local\.json$  # project-local; not symlinked
-^/\.oh-my-zsh/custom/example\.zsh$ # OMZ boilerplate; avoids a spurious --adopt diff
+^/\.claude/settings\.local\.json$  # project-local
+^/\.oh-my-zsh/custom/example\.zsh$ # OMZ boilerplate
 ^/\.oh-my-zsh/custom/plugins/example$
 ^/\.oh-my-zsh/custom/themes/example\.zsh-theme$
+^/CLAUDE\.md$                      # repo-scoped agent instructions
+^/AGENTS\.md$
+^/check\.sh$                       # local checks

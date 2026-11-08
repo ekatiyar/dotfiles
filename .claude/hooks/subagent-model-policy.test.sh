@@ -30,8 +30,13 @@ check() { # expected json label
 check allow:sonnet '{"tool_input":{"subagent_type":"Explore"}}'                              'Explore, no model'
 check allow:sonnet '{"tool_input":{"subagent_type":"claude-code-guide","model":"inherit"}}'  'guide, inherit'
 check allow:opus   '{"tool_input":{"subagent_type":"Plan","model":""}}'                      'Plan, empty'
+check allow:opus   '{"tool_input":{"subagent_type":"general-purpose"}}'                       'general-purpose, no model'
+check allow:opus   '{"tool_input":{"subagent_type":"claude"}}'                                'claude, no model'
+# Forks always inherit the parent model, so the hook stays out of the way.
+check silent       '{"tool_input":{"subagent_type":"fork"}}'                                  'fork, no model'
 # Unknown type without an explicit model -> denied.
-check deny         '{"tool_input":{"subagent_type":"general-purpose"}}'                       'unknown type, no model'
+check deny         '{"tool_input":{}}'                                                        'omitted type, no model'
+check deny         '{"tool_input":{"subagent_type":"my-custom-agent"}}'                       'unknown type, no model'
 # Deliberate model choice -> left untouched (silent passthrough).
 check silent       '{"tool_input":{"subagent_type":"general-purpose","model":"opus"}}'        'explicit opus passthrough'
 check silent       '{"tool_input":{"subagent_type":"Explore","model":"haiku"}}'               'explicit haiku passthrough'
