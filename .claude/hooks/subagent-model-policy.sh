@@ -17,8 +17,9 @@ esac
 
 # Auto-assign known agent types; require an explicit model for anything else.
 case "$agent" in
+  fork)                                       exit 0 ;; # forks ignore the model param
   Explore|claude-code-guide|statusline-setup) picked=sonnet ;;
-  Plan)                                       picked=opus ;;
+  Plan|general-purpose|claude)             picked=opus ;;
   *)
     reason="subagent-model-policy: agent '${agent:-unknown}' has no default model. Re-issue the Agent call with an explicit model param (opus, sonnet, or haiku)."
     jq -nc --arg r "$reason" '{
