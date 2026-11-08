@@ -15,6 +15,8 @@
 #
 set -euo pipefail
 
+# TODO: Add testing for this setup script
+
 # ----------------------------------------------------------------------------
 # Constants & helpers
 # ----------------------------------------------------------------------------
@@ -42,6 +44,17 @@ Usage:
   ./dotfiles/setup.sh --help    this message
 EOF
   exit 0
+}
+
+# Run a remote `curl | sh` installer. A failed update is only a warning if
+# <installed-path> already exists; a failed fresh install is fatal.
+# Usage: run_installer <installed-path> <url> [VAR=value...]
+run_installer() {
+  local installed=$1 url=$2; shift 2
+  if ! curl -fsSL --connect-timeout 10 --max-time 60 "$url" | env "$@" sh; then
+    [ -e "$installed" ] || die "Installer failed: $url"
+    warn "Update failed ($url); keeping existing $installed"
+  fi
 }
 
 # ----------------------------------------------------------------------------
@@ -143,7 +156,8 @@ install_omz() {
 # 5. install_codex - native installer, updates if already present
 install_codex() {
   log "Installing/updating Codex (native installer)"
-  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
+  run_installer "$HOME/.codex/packages/standalone/current/bin/codex" \
+    https://chatgpt.com/codex/install.sh CODEX_NON_INTERACTIVE=1
 }
 
 # 6. install_claude — native installer
